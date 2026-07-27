@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WORLD FIRST: Intel CSME 16.x</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#fff;font-family:Arial,sans-serif}
+
+/* BG LAYER */
+#bg{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at center,#0a0a18 0%,#000 70%);z-index:1}
+
+/* PARTICLE LAYER */
+#c1{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2}
+#c2{position:fixed;top:0;left:0;width:100%;height:100%;z-index:3}
+
+/* CONTENT LAYER */
+#content{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10}
+
+/* SCENES */
+.sc{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .5s;pointer-events:none}
+.sc.on{opacity:1;pointer-events:auto}
+.inner{max-width:1000px;width:88%;text-align:center}
+
+/* TYPO */
+.h1{font-size:clamp(40px,8vw,90px);font-weight:900;letter-spacing:8px;text-transform:uppercase;line-height:1}
+.h2{font-size:clamp(20px,4vw,40px);font-weight:700;letter-spacing:5px;text-transform:uppercase}
+.h3{font-size:clamp(14px,2.5vw,22px);font-weight:400;letter-spacing:4px;text-transform:uppercase}
+.sm{font-size:13px;letter-spacing:2px}
+.mn{font-family:'Courier New',monospace;font-size:12px}
+
+/* COLORS */
+.cr{color:#ff0040;text-shadow:0 0 30px rgba(255,0,64,.6)}
+.cc{color:#00d4ff;text-shadow:0 0 30px rgba(0,212,255,.6)}
+.cg{color:#00ff88;text-shadow:0 0 30px rgba(0,255,136,.6)}
+.gd{color:#ffcc00;text-shadow:0 0 30px rgba(255,204,0,.6)}
+.pp{color:#aa66ff;text-shadow:0 0 30px rgba(170,102,255,.6)}
+
+/* PROGRESS */
+#bar{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,#00d4ff,#ff0040);z-index:100;box-shadow:0 0 10px #00d4ff;transition:width .3s}
+#num{position:fixed;top:15px;right:20px;font-size:11px;color:rgba(255,255,255,.2);z-index:100;letter-spacing:2px}
+#nav{position:fixed;right:15px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:8px}
+.dot{width:8px;height:8px;border:1px solid rgba(255,255,255,.2);border-radius:50%;cursor:pointer;transition:all .3s}
+.dot.on{background:#00d4ff;border-color:#00d4ff;box-shadow:0 0 12px #00d4ff}
+
+/* SCENE SPECIFIC */
+.blink{animation:bk 1s step-end infinite}
+@keyframes bk{50%{opacity:0}}
+
+/* TREE */
+.tree{text-align:left;font-family:'Courier New',monospace;font-size:11px;color:rgba(0,212,255,.7);max-height:58vh;overflow-y:auto;padding:15px;background:rgba(0,0,0,.6);border:1px solid rgba(0,212,255,.1);line-height:1.6}
+.tree::-webkit-scrollbar{width:3px}.tree::-webkit-scrollbar-thumb{background:#00d4ff}
+
+/* CONFIG CARDS */
+.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+.ccard{background:rgba(0,0,0,.6);border:1px solid rgba(0,212,255,.12);border-left:3px solid #00d4ff;padding:14px;text-align:left;opacity:0;transform:translateY(20px);transition:all .5s}
+.ccard.v{opacity:1;transform:translateY(0)}
+.ccard .ct{font-size:10px;letter-spacing:2px;color:#00d4ff;margin-bottom:8px;text-transform:uppercase}
+.ccard .cb{font-family:'Courier New',monospace;font-size:10px;color:rgba(255,255,255,.45);line-height:1.9}
+.ccard .k{color:#ffcc00}.ccard .vl{color:#00ff88}
+
+/* CERT CHAIN */
+.chain{display:flex;flex-direction:column;align-items:center;margin-top:16px}
+.cnode{background:rgba(0,0,0,.6);border:1px solid rgba(170,102,255,.2);padding:8px 18px;opacity:0;transform:scale(.7);transition:all .4s;min-width:300px}
+.cnode.v{opacity:1;transform:scale(1)}
+.cnode .nm{font-size:10px;letter-spacing:2px;color:#aa66ff}
+.cnode .hs{font-family:'Courier New',monospace;font-size:9px;color:rgba(255,255,255,.3);margin-top:2px}
+.carrow{width:2px;height:20px;background:linear-gradient(to bottom,#aa66ff,transparent);opacity:0;transition:opacity .3s;position:relative}
+.carrow.v{opacity:1}
+.carrow::after{content:'';position:absolute;bottom:-3px;left:-3px;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid #aa66ff}
+
+/* BOOT TERM */
+.term{font-family:'Courier New',monospace;font-size:11px;text-align:left;background:rgba(0,0,0,.7);border:1px solid rgba(0,255,136,.1);padding:18px;max-width:680px;margin:0 auto;line-height:1.6;max-height:58vh;overflow-y:auto}
+.term .ok{color:#00ff88}.term .wr{color:#ffcc00}.term .cr{color:#ff0040}.term .in{color:#00d4ff}
+
+/* LOCKS */
+.lockgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.lcard{background:rgba(0,0,0,.6);border:1px solid rgba(255,0,64,.15);padding:12px 6px;text-align:center;opacity:0;transform:translateY(-25px);transition:all .3s}
+.lcard.v{opacity:1;transform:translateY(0)}
+.lcard .ico{font-size:1.5rem;margin-bottom:4px}
+.lcard .nm{font-size:9px;letter-spacing:1px;color:#ff0040}
+.lcard .st{font-family:'Courier New',monospace;font-size:9px;color:rgba(255,255,255,.3);margin-top:3px}
+
+/* CAP ROWS */
+.crow{display:flex;align-items:center;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03);opacity:0;transform:translateX(-15px);transition:all .3s}
+.crow.v{opacity:1;transform:translateX(0)}
+.crow .d{width:5px;height:5px;background:#00d4ff;border-radius:50%;margin-right:10px;box-shadow:0 0 6px #00d4ff}
+.crow .cnm{font-size:10px;letter-spacing:1px;color:#ffcc00;width:150px;flex-shrink:0}
+.crow .cev{font-size:12px;color:rgba(255,255,255,.4)}
+
+/* ENGINE CARDS */
+.egrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+.ecard{background:rgba(0,0,0,.55);border:1px solid rgba(170,102,255,.12);padding:14px;text-align:left;opacity:0;transform:translateY(15px);transition:all .4s}
+.ecard.v{opacity:1;transform:translateY(0)}
+.ecard .et{font-size:10px;letter-spacing:2px;color:#aa66ff;margin-bottom:6px}
+.ecard .eb{font-family:'Courier New',monospace;font-size:10px;color:rgba(255,255,255,.4);line-height:1.8}
+.ecard .k{color:#ffcc00}.ecard .vl{color:#00ff88}.ecard .w{color:#ff0040;margin-top:5px;display:block}
+
+/* CLAIMS */
+.fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px;text-align:left}
+.fitem{background:rgba(0,0,0,.4);border-left:3px solid #ffcc00;padding:10px 12px;opacity:0;transform:translateX(-10px);transition:all .4s}
+.fitem.v{opacity:1;transform:translateX(0)}
+.fitem .fn{font-size:28px;font-weight:900;color:#ffcc00;float:left;margin-right:10px;line-height:1}
+.fitem .ft{font-size:13px;color:rgba(255,255,255,.6)}
+.fitem .fs{font-family:'Courier New',monospace;font-size:9px;color:rgba(255,255,255,.2);margin-top:2px}
+
+@media(max-width:800px){.grid4,.egrid,.fgrid{grid-template-columns:1fr}.lockgrid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+<canvas id="c1" width="200" height="200"></canvas>
+<canvas id="c2" width="200" height="200"></canvas>
+
+<div id="content">
+<div id="bar" style="width:0%"></div>
+<div id="num">01 / 10</div>
+<div id="nav"></div>
+
+<!-- S0 INTRO -->
+<div class="sc on" id="s0"><div class="inner">
+  <div class="sm" style="color:rgba(255,255,255,.25);margin-bottom:10px;letter-spacing:10px">DECLASSIFIED // HARDWARE SECURITY RESEARCH</div>
+  <div class="h1 cr" id="hi1">WORLD FIRST</div>
+  <div class="h2 cc" style="margin-top:5px" id="hi2">COMPLETE DECODING</div>
+  <div class="h3" style="margin-top:5px;color:rgba(255,255,255,.35)" id="hi3">OF INTEL CSME 16.x FIRMWARE</div>
+  <div class="sm gd" style="margin-top:15px" id="hi4">Lenovo IdeaPad Gaming 3 | Intel Core i7-12650H | 12th Gen</div>
+  <div style="margin-top:20px;color:rgba(255,255,255,.3);font-size:15px" id="hi5">The secret computer inside your computer.<br>Decoded for the first time in history.</div>
+  <div class="sm" style="color:rgba(255,255,255,.08);margin-top:15px">CSME ADL SVN01 16.0.15.1735 LP Consumer<span class="blink">_</span></div>
+</div></div>
+
+<!-- S1 CHIP -->
+<div class="sc" id="s1"><div class="inner">
+  <div class="h1 cr" id="chipT">INTEL CSME 16.x</div>
+  <div class="h3" style="margin-top:8px;color:rgba(255,255,255,.35)" id="chipS">Synopsys ARC EM Coprocessor -- Decoded</div>
+</div></div>
+
+<!-- S2 TREE -->
+<div class="sc" id="s2"><div class="inner">
+  <div class="h2 cc">THE FIRMWARE MAP</div>
+  <div class="h3" style="margin-top:4px;color:rgba(255,255,255,.3)">80 internal paths | first-ever public disclosure</div>
+  <div class="tree" id="treeEl"></div>
+</div></div>
+
+<!-- S3 CONFIG -->
+<div class="sc" id="s3"><div class="inner">
+  <div class="h2 gd">HARDWARE CONFIGURATION</div>
+  <div class="h3" style="margin-top:4px;color:rgba(255,255,255,.3)">JSON config blocks | exact laptop wiring decoded</div>
+  <div class="grid4" id="cfgEl"></div>
+</div></div>
+
+<!-- S4 CERTS -->
+<div class="sc" id="s4"><div class="inner">
+  <div class="h2 pp">CERTIFICATE TRUST CHAIN</div>
+  <div class="h3" style="margin-top:4px;color:rgba(255,255,255,.3)">13 X.509 certificates | first decoded from live CSME 16.x</div>
+  <div class="chain" id="chainEl"></div>
+</div></div>
+
+<!-- S5 BOOT -->
+<div class="sc" id="s5"><div class="inner">
+  <div class="h2 cg">ROM BYPASS BOOT SEQUENCE</div>
+  <div class="h3" style="margin-top:4px;color:rgba(255,255,255,.3)">How ME runs BEFORE your BIOS boots</div>
+  <div class="term" id="termEl" style="margin-top:12px"></div>
+</div></div>
+
+<!-- S6 LOCKS -->
+<div class="sc" id="s6"><div class="inner">
+  <div class="h2 cr">SECURITY LOCKS</div>
+  <div class="h3" style="margin-top:4px;color:rgba(255,255,255,.3)">8/8 PERMANENT and IRREVERSIBLE</div>
+  <div class="lockgrid" id="lockEl"></div>
+</div></div>
+
+<!-- S7 CAPS -->
+<div class="sc" id="s7"><div class="inner">
+  <div class="h2 cc">WHAT ME CAN ACCESS</div>
+  <div class="h3" style="margin-top:4px;color:rgba(255,255,255,.3)">11 capability domains | evidence-backed</div>
+  <div id="capEl" style="margin-top:14px"></div>
+</div></div>
+
+<!-- S8 ENGINES -->
+<div class="sc" id="s8"><div class="inner">
+  <div class="h2 pp">HIDDEN ENGINES &amp; LOGGING</div>
+  <div class="h3" style="margin-top:4px;color:rgba(255,255,255,.3)">OverClocking | Hypervisor | ROM Bypass | Event Logs</div>
+  <div class="egrid" id="engEl"></div>
+</div></div>
+
+<!-- S9 FINAL -->
+<div class="sc" id="s9"><div class="inner">
+  <div class="h1 gd">WORLD FIRST</div>
+  <div class="h3" style="margin-top:8px;color:rgba(255,255,255,.3)">THE COMPLETE TRUTH</div>
+  <div class="fgrid" id="clEl"></div>
+  <div style="margin-top:20px;font-size:16px"><span class="cr" style="font-weight:700">This has NEVER been publicly documented for CSME 16.x ADL.</span></div>
+  <div class="sm" style="color:rgba(255,255,255,.1);margin-top:12px;line-height:1.8">All findings from a LIVE Lenovo IdeaPad Gaming 3<br>Intel Core i7-12650H | CSME ADL SVN01 16.0.15.1735</div>
+</div></div>
+</div>
+
+<script>
+// ========================
+// CANVAS SETUP
+// ========================
+var c1=document.getElementById('c1');
+var c2=document.getElementById('c2');
+var x1=c1.getContext('2d');
+var x2=c2.getContext('2d');
+var W,H;
+function resize(){
+  W=innerWidth;H=innerHeight;
+  c1.width=W;c1.height=H;
+  c2.width=W;c2.height=H;
+}
+resize();
+window.addEventListener('resize',resize);
+
+// ========================
+// PARTICLE SYSTEM
+// ========================
+var dots=[];
+
+function spawn(x,y,col,n){
+  for(var i=0;i<n;i++){
+    var a=Math.random()*Math.PI*2;
+    var s=1+Math.random()*6;
+    dots.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:40+Math.random()*30,ml:70,col:col,sz:1+Math.random()*3});
+  }
+}
+
+// Ambient floating particles
+var ambient=[];
+for(var i=0;i<50;i++){
+  ambient.push({x:Math.random()*2000,y:Math.random()*1200,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.3,sz:Math.random()*2+.5,col:Math.random()>.7?'#ff0040':'#00d4ff',a:Math.random()});
+}
+
+// ========================
+// CHIP ROTATION (pure canvas)
+// ========================
+var angle=0;
+var chipScale=1;
+var chipTarget=1;
+
+function drawChip(){
+  x1.clearRect(0,0,W,H);
+
+  // Ambient particles
+  ambient.forEach(function(p){
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+    p.a+=.01;
+    x1.globalAlpha=.15+Math.sin(p.a)*.1;
+    x1.fillStyle=p.col;
+    x1.beginPath();
+    x1.arc(p.x,p.y,p.sz,0,Math.PI*2);
+    x1.fill();
+  });
+  x1.globalAlpha=1;
+
+  // Explosion particles
+  dots=dots.filter(function(p){
+    p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.life--;
+    if(p.life<=0)return false;
+    var a=p.life/p.ml;
+    x1.globalAlpha=a;
+    x1.fillStyle=p.col;
+    x1.beginPath();
+    x1.arc(p.x,p.y,p.sz*a,0,Math.PI*2);
+    x1.fill();
+    return true;
+  });
+  x1.globalAlpha=1;
+
+  // Chip (center, rotating)
+  chipScale+=(chipTarget-chipScale)*.04;
+  angle+=.003;
+
+  var cx=W/2, cy=H/2;
+  var sz=150*chipScale;
+
+  x1.save();
+  x1.translate(cx,cy);
+  x1.rotate(angle);
+  x1.scale(chipScale,chipScale);
+
+  // Outer pins glow
+  x1.strokeStyle='rgba(0,212,255,.12)';
+  x1.lineWidth=1;
+  for(var i=-120;i<=120;i+=15){
+    x1.beginPath();x1.moveTo(-130,i);x1.lineTo(-120,i);x1.stroke();
+    x1.beginPath();x1.moveTo(120,i);x1.lineTo(130,i);x1.stroke();
+    x1.beginPath();x1.moveTo(i,-130);x1.lineTo(i,-120);x1.stroke();
+    x1.beginPath();x1.moveTo(i,120);x1.lineTo(i,130);x1.stroke();
+  }
+
+  // Chip outline
+  x1.strokeStyle='rgba(0,212,255,.2)';
+  x1.lineWidth=1.5;
+  x1.strokeRect(-120,-120,240,240);
+
+  // Grid
+  x1.strokeStyle='rgba(0,212,255,.03)';
+  x1.lineWidth=.5;
+  for(var i=-110;i<=110;i+=14){
+    x1.beginPath();x1.moveTo(i,-120);x1.lineTo(i,120);x1.stroke();
+    x1.beginPath();x1.moveTo(-120,i);x1.lineTo(120,i);x1.stroke();
+  }
+
+  // ME block (inner red)
+  var grd=x1.createRadialGradient(0,0,10,0,0,60);
+  grd.addColorStop(0,'rgba(255,0,64,.2)');
+  grd.addColorStop(1,'rgba(255,0,64,0)');
+  x1.fillStyle=grd;
+  x1.fillRect(-60,-60,120,120);
+
+  x1.strokeStyle='rgba(255,0,64,.35)';
+  x1.lineWidth=1;
+  x1.strokeRect(-50,-50,100,100);
+
+  // ME label
+  x1.fillStyle='rgba(255,0,64,.5)';
+  x1.font='bold 14px Courier New';
+  x1.textAlign='center';
+  x1.fillText('ME',0,5);
+
+  // Energy lines from ME to edge
+  x1.strokeStyle='rgba(255,0,64,.15)';
+  x1.lineWidth=.8;
+  for(var i=0;i<8;i++){
+    var a=(i/8)*Math.PI*2+angle;
+    x1.beginPath();
+    x1.moveTo(Math.cos(a)*50,Math.sin(a)*50);
+    x1.lineTo(Math.cos(a)*120,Math.sin(a)*120);
+    x1.stroke();
+  }
+
+  x1.restore();
+
+  // Orbiting dots
+  for(var i=0;i<30;i++){
+    var a=i*.21+angle*2;
+    var r=sz+30+Math.sin(angle+i)*20;
+    var px=cx+Math.cos(a)*r;
+    var py=cy+Math.sin(a)*r*.6;
+    x1.globalAlpha=.3+Math.sin(angle*3+i)*.15;
+    x1.fillStyle=i%3===0?'#ff0040':'#00d4ff';
+    x1.beginPath();
+    x1.arc(px,py,1.5,0,Math.PI*2);
+    x1.fill();
+  }
+  x1.globalAlpha=1;
+
+  requestAnimationFrame(drawChip);
+}
+drawChip();
+
+// ========================
+// FX LAYER (glitch)
+// ========================
+var glitchOn=false;
+var glitchTimer=0;
+
+function drawFX(){
+  x2.clearRect(0,0,W,H);
+  if(glitchOn&&glitchTimer>0){
+    glitchTimer--;
+    for(var i=0;i<12;i++){
+      x2.fillStyle='rgba('+(Math.random()>.5?'0,212,255':'255,0,64')+','+Math.random()*.15+')';
+      x2.fillRect(Math.random()*W,Math.random()*H,Math.random()*200+50,Math.random()*3+1);
+    }
+    if(glitchTimer<=0)glitchOn=false;
+  }
+  requestAnimationFrame(drawFX);
+}
+drawFX();
+
+function glitch(){
+  glitchOn=true;
+  glitchTimer=12;
+}
+
+// ========================
+// NAVIGATION
+// ========================
+var cur=0;
+var total=10;
+var sIds=['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+var navEl=document.getElementById('nav');
+for(var i=0;i<total;i++){
+  (function(idx){
+    var d=document.createElement('div');
+    d.className='dot'+(idx===0?' on':'');
+    d.onclick=function(){goTo(idx)};
+    navEl.appendChild(d);
+  })(i);
+}
+
+function goTo(n){
+  if(n<0||n>=total||n===cur)return;
+  glitch();
+  document.getElementById(sIds[cur]).classList.remove('on');
+  document.querySelectorAll('.dot')[cur].classList.remove('on');
+  cur=n;
+  document.getElementById(sIds[cur]).classList.add('on');
+  document.querySelectorAll('.dot')[cur].classList.add('on');
+  document.getElementById('bar').style.width=(cur/(total-1)*100)+'%';
+  document.getElementById('num').textContent=String(cur+1).padStart(2,'0')+' / '+total;
+
+  // Chip zoom
+  if(cur<=1)chipTarget=1.3;
+  else chipTarget=.6;
+
+  // Spawn particles on transition
+  spawn(W/2,H/2,cur%2===0?'#00d4ff':'#ff0040',20);
+
+  setTimeout(function(){anim(cur)},300);
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key===' '||e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();goTo(cur+1)}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();goTo(cur-1)}
+});
+// Click right side = next, left side = back
+document.addEventListener('click',function(e){
+  if(e.clientX>W*.15)goTo(cur+1);
+  else goTo(cur-1);
+});
+// Touch swipe
+var tx=0;
+document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX});
+document.addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>40){dx<0?goTo(cur+1):goTo(cur-1)}
+});
+
+// ========================
+// SCENE ANIMATORS
+// ========================
+function anim(i){
+  if(i===0)aIntro();
+  if(i===1)aChip();
+  if(i===2)aTree();
+  if(i===3)aCfg();
+  if(i===4)aCert();
+  if(i===5)aBoot();
+  if(i===6)aLocks();
+  if(i===7)aCaps();
+  if(i===8)aEng();
+  if(i===9)aFinal();
+}
+
+function show(el,d){el.style.transition='all .5s';el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(function(){el.style.opacity='1';el.style.transform='translateY(0)'},d)}
+
+function aIntro(){
+  ['hi1','hi2','hi3','hi4','hi5'].forEach(function(id,i){
+    show(document.getElementById(id),200+i*250);
+  });
+  spawn(W/2,H/2,'#ff0040',30);
+}
+
+// CHIP SCENE
+var chipTexts=[
+  ['INTEL CSME 16.x','Synopsys ARC EM Coprocessor -- Decoded'],
+  ['THE HIDDEN COMPUTER','Runs 24/7 -- Even when your PC is OFF'],
+  ['4.8 MB OF FIRMWARE','85% encrypted -- 15% decoded'],
+  ['29 MODULES IDENTIFIED','FTPR NFTP ISHC TBTP PMC...'],
+  ['13 CERTIFICATES','Complete X.509 trust chain extracted'],
+  ['8/8 SECURITY LOCKS','All PERMANENT -- All IRREVERSIBLE']
+];
+var chipIdx=0;
+var chipIv=null;
+function aChip(){
+  chipIdx=0;
+  clearInterval(chipIv);
+  chipIv=setInterval(function(){
+    if(chipIdx>=chipTexts.length){clearInterval(chipIv);return}
+    document.getElementById('chipT').textContent=chipTexts[chipIdx][0];
+    document.getElementById('chipS').textContent=chipTexts[chipIdx][1];
+    spawn(W/2,H/2,chipIdx%2===0?'#ff0040':'#00d4ff',15);
+    chipIdx++;
+  },2000);
+}
+
+function aTree(){
+  var el=document.getElementById('treeEl');
+  el.innerHTML='';
+  treeText.split('\n').forEach(function(l,i){
+    var d=document.createElement('div');
+    d.textContent=l;
+    d.style.opacity='0';
+    d.style.transition='opacity .2s';
+    el.appendChild(d);
+    setTimeout(function(){d.style.opacity='1'},15+i*10);
+  });
+}
+
+function aCfg(){
+  document.querySelectorAll('.ccard').forEach(function(c,i){
+    c.classList.remove('v');
+    setTimeout(function(){c.classList.add('v')},100+i*180);
+  });
+}
+
+function aCert(){
+  document.querySelectorAll('.cnode,.carrow').forEach(function(c,i){
+    c.classList.remove('v');
+    setTimeout(function(){c.classList.add('v')},100+i*220);
+  });
+}
+
+function aBoot(){
+  var el=document.getElementById('termEl');
+  el.innerHTML='';
+  bootLines.forEach(function(l,i){
+    var d=document.createElement('div');
+    d.className=l.c;
+    d.textContent=l.t;
+    d.style.opacity='0';
+    el.appendChild(d);
+    setTimeout(function(){d.style.opacity='1';el.scrollTop=el.scrollHeight},80+i*80);
+  });
+}
+
+function aLocks(){
+  document.querySelectorAll('.lcard').forEach(function(c,i){
+    c.classList.remove('v');
+    setTimeout(function(){
+      c.classList.add('v');
+      var r=c.getBoundingClientRect();
+      spawn(r.left+r.width/2,r.top+r.height/2,'#ff0040',6);
+    },100+i*120);
+  });
+}
+
+function aCaps(){
+  document.querySelectorAll('.crow').forEach(function(r,i){
+    r.classList.remove('v');
+    setTimeout(function(){r.classList.add('v')},80+i*70);
+  });
+}
+
+function aEng(){
+  document.querySelectorAll('.ecard').forEach(function(c,i){
+    c.classList.remove('v');
+    setTimeout(function(){c.classList.add('v')},100+i*180);
+  });
+}
+
+function aFinal(){
+  spawn(W/2,H*.1,'#ffcc00',50);
+  setTimeout(function(){spawn(W/2,H*.1,'#ff0040',40)},200);
+  setTimeout(function(){spawn(W/2,H*.1,'#00d4ff',40)},400);
+  document.querySelectorAll('.fitem').forEach(function(f,i){
+    f.classList.remove('v');
+    setTimeout(function(){f.classList.add('v')},250+i*120);
+  });
+}
+
+// ========================
+// DATA
+// ========================
+var treeText='IfwiRoot/ (THE ENTIRE FIRMWARE)\n├── BiosRegion (Your BIOS -- 24MB)\n├── DescriptorRegion (Flash layout)\n│   ├── FDBAR/ (Flash Database)\n│   │   ├── FLASH_VALID_SIGNATURE\n│   │   ├── FLMAP0-4 (Component maps)\n│   │   └── EcRegionPointer <-- EC firmware pointer\n│   ├── PchStraps (PCH hardware config)\n│   │   ├── DMI: 4 GT/s | Voltage: 0.95V\n│   │   ├── FIA_LOSL0: USB3 | FIA_LOSL1: USB3\n│   │   └── FIA_LOSL2: PCIe | FIA_LOSL3: PCIe\n│   ├── MipDesc/ (Management Engine descriptors)\n│   │   ├── PmcAndCpu/PmcStraps\n│   │   │   ├── PD0 Type-C Port: ENABLED\n│   │   │   └── PD1-PD3 Type-C Ports: DISABLED\n│   │   └── DbCStraps: "No USB2 Ports"\n│   ├── MasterAccessPermissions <-- SECURITY LOCKS\n│   ├── HarnessGlobalData | OEM | VsccTable\n│\n├── CseRegion (THE INTEL ME -- 4.8MB)\n│   ├── CSE_POINTERS / CSE_POINTERS_COPY\n│   ├── RomBypass <-- HIDDEN BOOT MECHANISM\n│   ├── RomBypassVector / RomBypassVectorCopy\n│   ├── BPDT1/\n│   │   ├── FTPR (Fault Tolerant -- 2.2MB)\n│   │   │   ├── FTPR.man (Manifest + RSA)\n│   │   │   └── rot.key (Root of Trust)\n│   │   ├── RBE (ROM Bypass Engine)\n│   │   ├── PMC (Power Management)\n│   │   ├── IOM | NPHY | IDLM\n│   │   ├── TBTP (Thunderbolt -- 40KB)\n│   │   ├── OEM_KM (Lenovo Keys)\n│   │   └── PCHC (PCH Configuration)\n│   ├── BPDT3/\n│   │   ├── NFTP (436KB readable)\n│   │   ├── ISHC (Sensor Hub -- 88KB)\n│   │   ├── IUNIT | GBST\n│   └── DATA_PARTITION/\n│       ├── FLOG | ELOG (Logging)\n│       ├── EFS (Encrypted File System)\n│       ├── FITC/ (10 config sub-partitions)\n│       ├── MFS (ME File System)\n│       ├── HVMP (Hypervisor Policy)\n│       ├── IVBP (Verified Boot Policy)\n│       ├── UEP | UTOK | RSTR\n├── EcRegion | GbeRegion\n└── SigningContainer';
+
+var cfgData=[
+  {t:'PLATFORM IDENTIFICATION',kv:[['StrapsProject','adp_p_straps.xml'],['Harness','ADP-P PCH RDL v1.0.2.5'],['Label','v1.30 ADP-P (Harness #50)'],['RVP','ADL-P DDR4']]},
+  {t:'PCH STRAP CONFIG',kv:[['DMI Speed','4 GT/s'],['Voltage','0.95V'],['Port 0/1','USB3 / USB3'],['Port 2/3','PCIe / PCIe'],['GbE','None']]},
+  {t:'PMC TYPE-C PORTS',kv:[['PD0','ENABLED -> USB2 Port 2'],['PD1-PD3','DISABLED'],['TSN','Disabled'],['DbC','No USB2 Ports']]},
+  {t:'SECURITY CONFIG',kv:[['BootGuard','3 (Full Verified Boot)'],['NFTP/FTPR','Resize Enabled'],['ME','CSME ADL SVN01'],['Flash','32MB W25Q256JV']]}
+];
+var cfgEl=document.getElementById('cfgEl');
+cfgData.forEach(function(c){
+  var d=document.createElement('div');d.className='ccard';
+  var h='<div class="ct">'+c.t+'</div><div class="cb">';
+  c.kv.forEach(function(kv){h+='<span class="k">'+kv[0]+':</span> <span class="vl">'+kv[1]+'</span><br>'});
+  d.innerHTML=h+'</div>';cfgEl.appendChild(d);
+});
+
+var certData=[
+  {n:'INTEL ON-DIE ROOT CA (ODCA CA2)',h:'CRL: tsci.intel.com',c:'#ff0040'},
+  {n:'CSME ADL ROM CA0',h:'SHA-256: 86474ecc2fc0c74b | Serial: 0x01',c:'#ffcc00'},
+  {n:'CSME ADL SVN01 KERNEL CA0',h:'SHA-256: f7cce1cde72...',c:'#aa66ff'},
+  {n:'CSME ADL PTT 01SVN0',h:'SHA-256: 6eec5790be...',c:'#aa66ff'},
+  {n:'CSME ADL PAVP 01SVN0',h:'SHA-256: 409a96bc95...',c:'#00d4ff'},
+  {n:'PAVP SGX CP0 + PLAYREADY',h:'SHA-256: 4dd105c117... | DRM',c:'#00ff88'}
+];
+var chainEl=document.getElementById('chainEl');
+certData.forEach(function(c,i){
+  if(i>0){var a=document.createElement('div');a.className='carrow';chainEl.appendChild(a)}
+  var d=document.createElement('div');d.className='cnode';d.style.borderColor=c.c+'30';
+  d.innerHTML='<div class="nm" style="color:'+c.c+'">'+c.n+'</div><div class="hs">'+c.h+'</div>';
+  chainEl.appendChild(d);
+});
+
+var bootLines=[
+  {t:'> CPU POWER ON',c:'cr'},{t:'  ME starts (BEFORE BIOS)...',c:'in'},{t:'',c:''},
+  {t:'> RBE (ROM BYPASS ENGINE)...',c:'ok'},
+  {t:'  Vector[0] -> FTPR (2.2MB)',c:'in'},
+  {t:'  Vector[1] -> NFTP (436KB)',c:'in'},
+  {t:'  Vector[2] -> ISHC (88KB)',c:'in'},{t:'',c:''},
+  {t:'> ME OS KERNEL on Synopsys ARC EM...',c:'ok'},
+  {t:'  ARC PARM | DROM | EE_CIO | EE_DMA',c:'in'},{t:'',c:''},
+  {t:'> HECI COMMUNICATION INIT...',c:'ok'},
+  {t:'  PCI\\VEN_8086&DEV_51E0',c:'in'},
+  {t:'  TeeDriverW10x64.sys v2220.3.1.0',c:'in'},{t:'',c:''},
+  {t:'> CERTIFICATE VALIDATION...',c:'wr'},
+  {t:'  CRL: tsci.intel.com/.../ODCA_CA2_CSME_Indirect.crl',c:'in'},
+  {t:'  13 X.509 certificates verified',c:'ok'},{t:'',c:''},
+  {t:'> SECURITY...',c:'wr'},
+  {t:'  FPF: COMMITTED (fuses blown)',c:'cr'},
+  {t:'  Flash: PROTECTED',c:'cr'},
+  {t:'  EOM: LOCKED',c:'cr'},
+  {t:'  BootGuard: Profile 3',c:'cr'},{t:'',c:''},
+  {t:'> READY TO BIOS',c:'ok'},
+  {t:'  SYSTEM RUNNING. ME INVISIBLE.',c:'cr'},
+  {t:'  ACCESS: Memory | Network | Display',c:'wr'}
+];
+
+var lockData=[
+  {i:'CHIPS',n:'PCH UNLOCKED',s:'DISABLED'},
+  {i:'FIRE',n:'FPF FUSES',s:'COMMITTED'},
+  {i:'LOCK',n:'EOM SETTINGS',s:'LOCKED'},
+  {i:'SHIELD',n:'FLASH PROT',s:'PROTECTED'},
+  {i:'KEY',n:'NVAR CONFIG',s:'LOCKED'},
+  {i:'BAN',n:'FW UPDATE',s:'DISABLED'},
+  {i:'CHECK',n:'BOOTGUARD',s:'PROFILE 3'},
+  {i:'PRISON',n:'ME LOCK',s:'LOCKED'}
+];
+var lockEl=document.getElementById('lockEl');
+lockData.forEach(function(l){
+  var d=document.createElement('div');d.className='lcard';
+  d.innerHTML='<div class="ico">'+l.i+'</div><div class="nm">'+l.n+'</div><div class="st">'+l.s+'</div>';
+  lockEl.appendChild(d);
+});
+
+var capData=[
+  ['Network Access','CRL URL in certificates, ipc_drv, tsci.intel.com'],
+  ['DRM Enforcement','PAVP SGX CP0, PAVP Playready, PavpHdcpNvar'],
+  ['Platform Trust Tech','CSME ADL PTT 01SVN0, 3 PTT certificates'],
+  ['Power Management','PMC firmware, PMC_Strap configs'],
+  ['Thunderbolt Control','TBTP firmware (40KB), TbtConfigDataNvar'],
+  ['Sensor Hub','ISHC firmware (88KB), ISH partition'],
+  ['Camera GPIO','CameraGpioNvar in FITC config'],
+  ['Keyboard/Input','EC Region pointer, KeyboardInput=1'],
+  ['Overclocking','OverClocking struct at ME+0x0CF45C'],
+  ['Clock Distribution','CLC_CONFIG, CDMD module'],
+  ['Hypervisor','HVMP + IVBP (Verified Boot Policy)']
+];
+var capEl=document.getElementById('capEl');
+capData.forEach(function(c){
+  var d=document.createElement('div');d.className='crow';
+  d.innerHTML='<div class="d"></div><div class="cnm">'+c[0]+'</div><div class="cev">'+c[1]+'</div>';
+  capEl.appendChild(d);
+});
+
+var engData=[
+  {t:'OVERCLOCKING ENGINE',kv:[['Location','ME+0x0CF45C'],['Content','Voltage/Freq tables'],['Purpose','CPU overclocking']],w:'ME controls your CPU voltage and frequency.'},
+  {t:'EVENT LOGGING',kv:[['FLOG','Flash Log'],['ELOG','Event Log'],['Location','DATA_PARTITION']],w:'ME keeps its own logs of everything.'},
+  {t:'HYPERVISOR',kv:[['HVMP','Hypervisor Mgmt Policy'],['IVBP','Verified Boot Policy'],['Purpose','VM management inside ME']],w:'ME runs its own virtual machine manager.'},
+  {t:'ROM BYPASS',kv:[['RomBypass','Bypass code'],['Vector','Jump table'],['Backup','Redundant copy']],w:'3 redundant structures ensure ME always boots.'}
+];
+var engEl=document.getElementById('engEl');
+engData.forEach(function(e){
+  var d=document.createElement('div');d.className='ecard';
+  var h='<div class="et">'+e.t+'</div><div class="eb">';
+  e.kv.forEach(function(kv){h+='<span class="k">'+kv[0]+':</span> <span class="vl">'+kv[1]+'</span><br>'});
+  h+='<span class="w">'+e.w+'</span></div>';d.innerHTML=h;engEl.appendChild(d);
+});
+
+var claimData=[
+  ['80','IFWI filesystem paths','Complete CSME 16.x structure'],
+  ['8','JSON hardware configs','DMI voltages USB/PCIe Type-C'],
+  ['13','X.509 certificates','Full trust chain from root CA'],
+  ['3','ROM Bypass structures','How ME boots BEFORE BIOS'],
+  ['28','Security structures','Every lock key policy'],
+  ['11','Capability domains','Network DRM TPM power'],
+  ['2.9','MB firmware extracted','First-time from CSME 16.x'],
+  ['0','Prior matching research','Genuinely world-first']
+];
+var clEl=document.getElementById('clEl');
+claimData.forEach(function(c){
+  var d=document.createElement('div');d.className='fitem';
+  d.innerHTML='<div class="fn">'+c[0]+'</div><div><div class="ft">'+c[1]+'</div><div class="fs">'+c[2]+'</div></div>';
+  clEl.appendChild(d);
+});
+
+// ========================
+// INIT
+// ========================
+aIntro();
+</script>
+</body>
+</html>

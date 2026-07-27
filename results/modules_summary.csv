@@ -1,0 +1,30 @@
+module,name,category,size_bytes,size_kb,offset,purpose
+1,kernel,Core,108544,106,0x02002000,OS kernel - brain of ME
+2,bup,Core,327680,312,0x02031000,Boot Up - first code at power-on
+3,syslib,Core,151552,148,0x02015000,System library - core functions
+4,loadmgr,Core,28672,28,0x02086000,Module loader
+5,vfs,Core,94208,92,0x02072000,Virtual File System
+6,evtdisp,Core,16384,16,0x02083000,Event dispatcher
+7,maestro,Core,16384,16,0x020DC3C0,Orchestration engine
+8,crypto,Security,221184,216,0x02091000,Cryptography engine
+9,policy,Security,36864,36,0x020CE180,Security policy engine
+10,fpf,Security,20480,20,0x020B9000,Fused Protection Fuses
+11,rot.key,Security,1944,2,0x00001000,Root of Trust key
+12,mca_boot,Security,16384,16,0x02102000,Boot authentication
+13,mca_srv,Security,28672,28,0x02104580,Runtime security service
+14,heci,Comms,36864,36,0x020D4380,Host Embedded Controller Interface
+15,ipc_drv,Comms,16384,16,0x020CB300,Inter-Process Communication
+16,sec_msg,Comms,4096,4,0x020CD8C0,Secure messaging
+17,prtc,Comms,8192,8,0x0208D000,Protocol handler
+18,smbus,Comms,8311,8,0x0008E000,SMBus interface
+19,busdrv,Comms,8192,8,0x0208B000,Bus driver
+20,ptt,Platform,167936,164,0x020E4B40,Intel Platform Trust Technology
+21,pm,Platform,16384,16,0x0206F000,Power Manager
+22,pmdrv,Platform,12288,12,0x020DA680,Power Management driver
+23,fwupdate,Platform,36864,36,0x020DEB40,Firmware update engine
+24,storage,Platform,73728,72,0x020BD000,Flash storage manager
+25,gpio,Platform,8192,8,0x020C9B40,GPIO controller
+26,intl.cfg,Config,18815,18,0x0006A000,Intel Configuration
+27,FTPR.man,Config,1396,1,0x000002CC,Firmware manifest
+28,fitc.cfg,Config,0,0,0x00000000,Flash Image Tool config
+29,intl.cfg.met,Config,72,0,0x00000840,Configuration metadata

@@ -1,0 +1,17 @@
+# OS
+Thumbs.db
+Desktop.ini
+
+# Python
+__pycache__/
+*.pyc
+
+# Binaries (too large for git)
+*.bin
+*.rom
+*.img
+*.elf
+
+# Temporary
+*.tmp
+*.bak

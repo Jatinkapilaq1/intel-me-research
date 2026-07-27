@@ -1,0 +1,14 @@
+feature,status,risk_level,meaning
+FPF Committed,Yes,CRITICAL,One-time fuses blown permanently
+PCH Unlocked,Disabled,HIGH,Hardware-level lock active
+Flash Protection,Protected,HIGH,SPI flash write-locked
+BootGuard Profile,3 (Full),HIGH,Maximum boot verification
+Measured Boot,Enabled,HIGH,Every boot component hashed
+NVAR Config,Locked,MEDIUM,Configuration cannot be changed
+EOM Settings,Lock,MEDIUM,End-of-Manufacturing locked
+FWUpdate Support,No,MEDIUM,Firmware updates disabled
+CPU Debugging,Enabled,LOW,Intel debugging interface active
+OEM Configuration,Yes,INFO,OEM-customized firmware
+Production Ready,Yes,INFO,Firmware is production build
+ME Version,16.0.15.1735,INFO,CSME ADL SVN01 Consumer LP
+ME Date,2022-02-17,INFO,Firmware build date
