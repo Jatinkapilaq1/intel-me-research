@@ -220,15 +220,15 @@ var dots=[];
 function spawn(x,y,col,n){
   for(var i=0;i<n;i++){
     var a=Math.random()*Math.PI*2;
-    var s=1+Math.random()*6;
-    dots.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:40+Math.random()*30,ml:70,col:col,sz:1+Math.random()*3});
+    var s=2+Math.random()*8;
+    dots.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:40+Math.random()*30,ml:70,col:col,sz:2+Math.random()*4});
   }
 }
 
 // Ambient floating particles
 var ambient=[];
-for(var i=0;i<50;i++){
-  ambient.push({x:Math.random()*2000,y:Math.random()*1200,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.3,sz:Math.random()*2+.5,col:Math.random()>.7?'#ff0040':'#00d4ff',a:Math.random()});
+for(var i=0;i<100;i++){
+  ambient.push({x:Math.random()*2000,y:Math.random()*1200,vx:(Math.random()-.5)*.7,vy:(Math.random()-.5)*.5,sz:Math.random()*3+.8,col:Math.random()>.7?'#ff0040':'#00d4ff',a:Math.random()});
 }
 
 // ========================
@@ -246,10 +246,10 @@ function drawChip(){
     p.x+=p.vx;p.y+=p.vy;
     if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
     p.a+=.01;
-    x1.globalAlpha=.15+Math.sin(p.a)*.1;
+    x1.globalAlpha=.45+Math.sin(p.a)*.25;
     x1.fillStyle=p.col;
     x1.beginPath();
-    x1.arc(p.x,p.y,p.sz,0,Math.PI*2);
+    x1.arc(p.x,p.y,p.sz*2,0,Math.PI*2);
     x1.fill();
   });
   x1.globalAlpha=1;
@@ -281,8 +281,8 @@ function drawChip(){
   x1.scale(chipScale,chipScale);
 
   // Outer pins glow
-  x1.strokeStyle='rgba(0,212,255,.12)';
-  x1.lineWidth=1;
+  x1.strokeStyle='rgba(0,212,255,.3)';
+  x1.lineWidth=1.5;
   for(var i=-120;i<=120;i+=15){
     x1.beginPath();x1.moveTo(-130,i);x1.lineTo(-120,i);x1.stroke();
     x1.beginPath();x1.moveTo(120,i);x1.lineTo(130,i);x1.stroke();
@@ -291,12 +291,15 @@ function drawChip(){
   }
 
   // Chip outline
-  x1.strokeStyle='rgba(0,212,255,.2)';
-  x1.lineWidth=1.5;
+  x1.shadowColor='#00d4ff';
+  x1.shadowBlur=15;
+  x1.strokeStyle='rgba(0,212,255,.5)';
+  x1.lineWidth=2;
   x1.strokeRect(-120,-120,240,240);
+  x1.shadowBlur=0;
 
   // Grid
-  x1.strokeStyle='rgba(0,212,255,.03)';
+  x1.strokeStyle='rgba(0,212,255,.08)';
   x1.lineWidth=.5;
   for(var i=-110;i<=110;i+=14){
     x1.beginPath();x1.moveTo(i,-120);x1.lineTo(i,120);x1.stroke();
@@ -305,24 +308,27 @@ function drawChip(){
 
   // ME block (inner red)
   var grd=x1.createRadialGradient(0,0,10,0,0,60);
-  grd.addColorStop(0,'rgba(255,0,64,.2)');
+  grd.addColorStop(0,'rgba(255,0,64,.4)');
   grd.addColorStop(1,'rgba(255,0,64,0)');
   x1.fillStyle=grd;
   x1.fillRect(-60,-60,120,120);
 
-  x1.strokeStyle='rgba(255,0,64,.35)';
-  x1.lineWidth=1;
+  x1.strokeStyle='rgba(255,0,64,.6)';
+  x1.lineWidth=1.5;
+  x1.shadowColor='#ff0040';
+  x1.shadowBlur=12;
   x1.strokeRect(-50,-50,100,100);
+  x1.shadowBlur=0;
 
   // ME label
-  x1.fillStyle='rgba(255,0,64,.5)';
-  x1.font='bold 14px Courier New';
+  x1.fillStyle='rgba(255,0,64,.8)';
+  x1.font='bold 16px Courier New';
   x1.textAlign='center';
   x1.fillText('ME',0,5);
 
   // Energy lines from ME to edge
-  x1.strokeStyle='rgba(255,0,64,.15)';
-  x1.lineWidth=.8;
+  x1.strokeStyle='rgba(255,0,64,.3)';
+  x1.lineWidth=1.2;
   for(var i=0;i<8;i++){
     var a=(i/8)*Math.PI*2+angle;
     x1.beginPath();
@@ -339,10 +345,10 @@ function drawChip(){
     var r=sz+30+Math.sin(angle+i)*20;
     var px=cx+Math.cos(a)*r;
     var py=cy+Math.sin(a)*r*.6;
-    x1.globalAlpha=.3+Math.sin(angle*3+i)*.15;
+    x1.globalAlpha=.5+Math.sin(angle*3+i)*.3;
     x1.fillStyle=i%3===0?'#ff0040':'#00d4ff';
     x1.beginPath();
-    x1.arc(px,py,1.5,0,Math.PI*2);
+    x1.arc(px,py,2.5,0,Math.PI*2);
     x1.fill();
   }
   x1.globalAlpha=1;
@@ -362,8 +368,8 @@ function drawFX(){
   if(glitchOn&&glitchTimer>0){
     glitchTimer--;
     for(var i=0;i<12;i++){
-      x2.fillStyle='rgba('+(Math.random()>.5?'0,212,255':'255,0,64')+','+Math.random()*.15+')';
-      x2.fillRect(Math.random()*W,Math.random()*H,Math.random()*200+50,Math.random()*3+1);
+      x2.fillStyle='rgba('+(Math.random()>.5?'0,212,255':'255,0,64')+','+Math.random()*.35+')';
+      x2.fillRect(Math.random()*W,Math.random()*H,Math.random()*200+50,Math.random()*4+1);
     }
     if(glitchTimer<=0)glitchOn=false;
   }
