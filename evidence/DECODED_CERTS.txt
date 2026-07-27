@@ -1,0 +1,262 @@
+================================================================================
+  INTEL CSME 16.x X.509 CERTIFICATES — DECODED FROM LIVE FIRMWARE
+  Device: Lenovo IdeaPad Gaming 3 15IAH7 | CSME 16.0.15.1735 LP Consumer
+================================================================================
+
+--------------------------------------------------------------------------------
+CERT 01: cert_01_0x002508.der
+  Offset: 0x002508  |  Size: 509 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     86474ecc2fc0c74bb0032864f8ff347d7c4e3102cbf7d0f4557b2507cf134382
+  Org strings: CSME ADL ROM CA0, CSME ADL SVN01 Kernel CA0v0, Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    EC (elliptic curve)
+  EC Curve:    P-384 (secp384r1)
+  Cert Type:   ROM CA0 → Kernel CA0 CA Certificate
+  Strings:     CSME ADL ROM CA0 | 210623000000Z | 491231235959Z0#1!0 | CSME ADL SVN01 Kernel CA0v0 | Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl | B0@1&0$
+
+--------------------------------------------------------------------------------
+CERT 02: cert_02_0x223D22.der
+  Offset: 0x223D22  |  Size: 775 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     f7cce1cde7219bdc4e294cc68380b3b0119f1a0e629a8adab9664d7ce906d0d7
+  Org strings: CSME ADL PTT  01SVN0, tent/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODC#~A CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.intel.com/con
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    RSA
+  Cert Type:   PTT Certificate (leaf)
+  Strings:     CSME ADL PTT  01SVN0 | 210623000000Z | 491231235959Z0 | b?.b | wRM/ | Qg3"
+
+--------------------------------------------------------------------------------
+CERT 03: cert_03_0x2252D2.der
+  Offset: 0x2252D2  |  Size: 572 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     6eec5790beaf28177ce9df8f0419034eabf250de30325805cf23850e7f329e9a
+  Org strings: CSME ADL PTT  01SVN0, A/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME xQIntermediate CA1
+  CRL URL:     https://tsci.intel.com/content/OnDieC
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    EC (elliptic curve)
+  EC Curve:    P-256 (secp256r1)
+  Cert Type:   PTT Certificate (signed by ODCA CA2)
+  Strings:     CSME ADL PTT  01SVN0 | 210623000000Z | 491231235959Z0 | Fhttps://tsci.intel.com/content/OnDieC | A/crls/ODCA_CA2_CSME_Indirect.crl | B0@1&0$
+
+--------------------------------------------------------------------------------
+CERT 04: cert_04_0x225902.der
+  Offset: 0x225902  |  Size: 601 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     4f2edcfbf84bb43a872f3130af332398e4e4d71b34b9598088520091f7a4adf6
+  Org strings: CSME ADL PTT  01SVN0, Fhttps://:8tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://:8tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    EC (elliptic curve)
+  EC Curve:    P-384 (secp384r1)
+  Cert Type:   PTT Certificate (signed by ODCA CA2)
+  Strings:     ^+bx0)h0 | CSME ADL PTT  01SVN0 | 210623000000Z | 491231235959Z0 | 0C[j | vZ0/
+
+--------------------------------------------------------------------------------
+CERT 05: cert_05_0x225CE0.der
+  Offset: 0x225CE0  |  Size: 517 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     7d42f2f339774ce5a1032ce966370f6abed6b60bc62157288c62034d1ac8aab0
+  Org strings: CSME ADL SVN01 Kernel CA0, CSME ADL PTT  01SVN0v0, l.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.inte
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Cert Type:   Kernel CA0 → PTT Certificate
+  Strings:     0#1!0 | CSME ADL SVN01 Kernel CA0 | 21062MI3000000Z | 491231235959Z0 | CSME ADL PTT  01SVN0v0 | T+'P
+
+--------------------------------------------------------------------------------
+CERT 06: cert_06_0x233944.der
+  Offset: 0x233944  |  Size: 482 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     409a96bc95c80f664addd25be1290d005a0613f1a98ef56fcbf7e1d0e0977c0e
+  Org strings: CSME ADL PAVP 01SVN0, *_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA
+  CRL URL:     https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Cert Type:   PAVP SGX Certificate (leaf)
+  Strings:     CSME ADL PAVP 01SVN0 | 210623000000Z | 491231235959Z0 | PAVP SGX CP0v0 | 'Bo0 | Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2
+
+--------------------------------------------------------------------------------
+CERT 07: cert_07_0x23CC58.der
+  Offset: 0x23CC58  |  Size: 517 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     52a237bd3f1ed7512ec9314c03dabbdd6a22df36ef822c8cf4dac8694a0bd462
+  Org strings: CSME ADL SVN01 Kernel CA0, CSME ADL PAVP 01SVN0v0, l.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.inte~
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Cert Type:   Kernel CA0 → PAVP Certificate
+  Strings:     0#1!0 | CSME ADL SVN01 Kernel CA0 | 21062 | 3000000Z | 491231235959Z0 | CSME ADL PAVP 01SVN0v0
+
+--------------------------------------------------------------------------------
+CERT 08: cert_08_0x26F3DA.der
+  Offset: 0x26F3DA  |  Size: 485 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     4dd105c11773470e9902a891c747752b2e7909caf1a64f881ede005291aa6ce7
+  Org strings: CSME ADL PAVP 01SVN0, CA2_CSME_Indirect.crl, ODCA CA2 CSME IntermediateWE CA1
+  CRL URL:     https://tsci.intel.com/content/OnDieCA/crls/ODCA_g
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Cert Type:   PAVP Playready Certificate (leaf)
+  Strings:     Wg10 | CSME ADL PAVP 01SVN0 | 210623000000Z | 491231235959Z0 | PAVP Playready0v0 | 'Bo0
+
+--------------------------------------------------------------------------------
+CERT 09: cert_09_0x28918C.der
+  Offset: 0x28918C  |  Size: 509 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     610cd1c4b88a3d222299e649ec0b0174eddbea6be14d076b47ce5a95712dfefb
+  Org strings: CSME ADL ROM CA0, CSME ADL SVN01 Kernel CA0v0, Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    EC (elliptic curve)
+  EC Curve:    P-384 (secp384r1)
+  Cert Type:   ROM CA0 → Kernel CA0 CA Certificate
+  Strings:     CSME ADL ROM CA0 | 210623000000Z | 491231235959Z0#1!0 | CSME ADL SVN01 Kernel CA0v0 | zpXc | Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+
+--------------------------------------------------------------------------------
+CERT 10: cert_10_0x28A18C.der
+  Offset: 0x28A18C  |  Size: 509 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     610cd1c4b88a3d222299e649ec0b0174eddbea6be14d076b47ce5a95712dfefb
+  Org strings: CSME ADL ROM CA0, CSME ADL SVN01 Kernel CA0v0, Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    EC (elliptic curve)
+  EC Curve:    P-384 (secp384r1)
+  Cert Type:   ROM CA0 → Kernel CA0 CA Certificate
+  Strings:     CSME ADL ROM CA0 | 210623000000Z | 491231235959Z0#1!0 | CSME ADL SVN01 Kernel CA0v0 | zpXc | Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+
+--------------------------------------------------------------------------------
+CERT 11: cert_11_0x28B18C.der
+  Offset: 0x28B18C  |  Size: 509 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     610cd1c4b88a3d222299e649ec0b0174eddbea6be14d076b47ce5a95712dfefb
+  Org strings: CSME ADL ROM CA0, CSME ADL SVN01 Kernel CA0v0, Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    EC (elliptic curve)
+  EC Curve:    P-384 (secp384r1)
+  Cert Type:   ROM CA0 → Kernel CA0 CA Certificate
+  Strings:     CSME ADL ROM CA0 | 210623000000Z | 491231235959Z0#1!0 | CSME ADL SVN01 Kernel CA0v0 | zpXc | Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+
+--------------------------------------------------------------------------------
+CERT 12: cert_12_0x29018C.der
+  Offset: 0x29018C  |  Size: 509 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     610cd1c4b88a3d222299e649ec0b0174eddbea6be14d076b47ce5a95712dfefb
+  Org strings: CSME ADL ROM CA0, CSME ADL SVN01 Kernel CA0v0, Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    EC (elliptic curve)
+  EC Curve:    P-384 (secp384r1)
+  Cert Type:   ROM CA0 → Kernel CA0 CA Certificate
+  Strings:     CSME ADL ROM CA0 | 210623000000Z | 491231235959Z0#1!0 | CSME ADL SVN01 Kernel CA0v0 | zpXc | Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+
+--------------------------------------------------------------------------------
+CERT 13: cert_13_0x29118C.der
+  Offset: 0x29118C  |  Size: 509 bytes
+--------------------------------------------------------------------------------
+  SHA-256:     610cd1c4b88a3d222299e649ec0b0174eddbea6be14d076b47ce5a95712dfefb
+  Org strings: CSME ADL ROM CA0, CSME ADL SVN01 Kernel CA0v0, Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl, ODCA CA2 CSME Intermediate CA1
+  CRL URL:     https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+  Date:        2106-23-00 00:00Z
+  Date:        4912-31-23 59:59Z
+  Extension:   basicConstraints (CA cert)
+  Extension:   keyUsage
+  Key Type:    EC (elliptic curve)
+  EC Curve:    P-384 (secp384r1)
+  Cert Type:   ROM CA0 → Kernel CA0 CA Certificate
+  Strings:     CSME ADL ROM CA0 | 210623000000Z | 491231235959Z0#1!0 | CSME ADL SVN01 Kernel CA0v0 | zpXc | Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+
+================================================================================
+  CERTIFICATE CHAIN TRUST ANALYSIS
+================================================================================
+
+  IDENTIFIED CERTIFICATE TYPES:
+    cert_01_0x002508.der: ROM CA0 → Kernel CA0 CA Certificate
+    cert_02_0x223D22.der: PTT Certificate (leaf)
+    cert_03_0x2252D2.der: PTT Certificate (signed by ODCA CA2)
+    cert_04_0x225902.der: PTT Certificate (signed by ODCA CA2)
+    cert_05_0x225CE0.der: Kernel CA0 → PTT Certificate
+    cert_06_0x233944.der: PAVP SGX Certificate (leaf)
+    cert_07_0x23CC58.der: Kernel CA0 → PAVP Certificate
+    cert_08_0x26F3DA.der: PAVP Playready Certificate (leaf)
+    cert_09_0x28918C.der: ROM CA0 → Kernel CA0 CA Certificate
+    cert_10_0x28A18C.der: ROM CA0 → Kernel CA0 CA Certificate
+    cert_11_0x28B18C.der: ROM CA0 → Kernel CA0 CA Certificate
+    cert_12_0x29018C.der: ROM CA0 → Kernel CA0 CA Certificate
+    cert_13_0x29118C.der: ROM CA0 → Kernel CA0 CA Certificate
+
+  CERTIFICATE PURPOSE MAP:
+    Root CAs (On-Die):
+      └─ ODCA CA2 — On-Die Chiplet CA (Intel silicon root of trust)
+    Intermediate CAs:
+      ├─ ROM CA0 — ROM-based Certificate Authority
+      └─ Kernel CA0 — Kernel-level Certificate Authority
+    End-entity certificates:
+      ├─ PTT Certificate — Platform Trust Technology (firmware TPM)
+      ├─ PAVP Certificate — Protected Audio Video Path (DRM)
+      ├─ Playready Certificate — Microsoft Playready DRM
+      ├─ SGX Certificate — Software Guard Extensions attestation
+      └─ CSME SVN01 — ME firmware identity certificate
+
+  NETWORK EVIDENCE:
+    13/13 certificates contain CRL URLs:
+      cert_01_0x002508.der: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+      cert_02_0x223D22.der: https://tsci.intel.com/con
+      cert_03_0x2252D2.der: https://tsci.intel.com/content/OnDieC
+      cert_04_0x225902.der: https://:8tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+      cert_05_0x225CE0.der: https://tsci.inte
+      cert_06_0x233944.der: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2
+      cert_07_0x23CC58.der: https://tsci.inte~
+      cert_08_0x26F3DA.der: https://tsci.intel.com/content/OnDieCA/crls/ODCA_g
+      cert_09_0x28918C.der: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+      cert_10_0x28A18C.der: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+      cert_11_0x28B18C.der: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+      cert_12_0x29018C.der: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+      cert_13_0x29118C.der: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+    → PROVES Intel ME has network stack capability for CRL checking
+    → URL: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+
+================================================================================
+  SUMMARY
+================================================================================
+  Total certificates: 13
+  Unique by SHA-256:  9
+  With CRL URLs:      13
+  EC keys detected:   13
+  Root CAs:           0
+  Intermediate CAs:   8
+  End-entity:         0
