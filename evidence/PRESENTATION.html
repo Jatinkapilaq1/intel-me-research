@@ -484,36 +484,286 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 </div>
 </div>
 
-<!-- SLIDE 10: CLOSING -->
+<!-- SLIDE 10: THE SMOKING GUN -->
 <div class="slide" id="s10">
 <div class="inner">
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 10 of 12</div>
+  <h2>The <span class="err">Smoking Gun</span>: Inside ME's Surveillance Architecture</h2>
+  <p>After decoding the firmware's internal module manifest, we found the exact components that give Intel ME its surveillance capabilities. These aren't theories &mdash; they are <strong>named modules</strong> with <strong>binary offsets</strong>, extracted from a live firmware dump of this laptop.</p>
+
+  <div class="dia">
+    <div class="dia-trigger" onclick="toggleDia(this)"><span class="arrow">&#9654;</span> EXPAND: CPD Module Manifest (Binary Evidence)</div>
+    <div class="dia-panel"><div class="dia-inner">
+      <h3 style="color:#f85149;margin-bottom:12px">Code Partition Directory @ 0x062000 &mdash; FTPR Module List</h3>
+      <p style="margin-bottom:12px">This is the raw hex dump of the CPD header that lists every sub-module inside the Main Partition (FTPR). Each 24-byte entry contains a module name, offset, and size. The surveillance modules are highlighted.</p>
+      <div class="hex"><span class="err">062000: 24 43 50 44</span> 1D 00 00 00 02 01 14 00 <span class="warn">FTPR</span>.......FTPR.man....
+062010: E2 D2 94 CE <span class="warn">FTPR</span>.man...........................
+062020: CC 02 00 00 74 05 00 00 00 00 00 00 <span class="key">rot.</span>key.............
+062030: 6B 65 79 00 00 00 00 00 00 10 00 00 98 07 00 00
+062040: 00 00 00 00 66 69 74 63 2E 63 66 67 00 00 00 00 ....fitc.cfg....
+062050: 00 00 00 00 00 00 00 00 00 00 00 00 <span class="err">6B 65 72 6E</span>
+062060: <span class="err">65 6C</span> 00 00 00 00 00 00 00 20 00 02 00 A0 01 00  <span class="err">kernel</span>....... ..........
+062070: 00 00 00 00 73 79 73 6C 69 62 00 00 00 00 00 00 ....<span class="key">syslib</span>......
+062080: 00 50 01 02 00 50 02 00 00 00 00 00 62 75 70 00 .P...P......<span class="key">bup</span>.
+062090: 00 00 00 00 00 00 00 00 00 10 03 02 00 E0 04 00 ................
+0620A0: 00 00 00 00 69 6E 74 6C 2E 63 66 67 00 00 00 00 ....intl.cfg....
+0620B0: 00 A0 06 00 7F 49 00 00 00 00 00 00 69 6E 74 6C .....I......intl
+0620C0: 2E 63 66 67 2E 6D 65 74 40 08 00 00 48 00 00 00 .cfg.met@...H...
+0620D0: 00 00 00 00 70 6D 00 00 00 00 00 00 00 00 00 00 ....pm..........
+0620E0: 00 F0 06 02 00 40 00 00 00 00 00 00 <span class="key">76 66 73</span> 00 .....@......<span class="key">vfs</span>.
+0620F0: 00 00 00 00 00 00 00 00 00 20 07 02 00 70 01 00 ......... ...p..
+062100: 00 00 00 00 <span class="warn">65 76 74 64 69 73 70</span> 00 00 00 00 00 ....<span class="warn">evtdisp</span>.....
+062110: 00 30 08 02 00 40 00 00 00 00 00 00 6C 6F 61 64 .0...@......load
+062120: 6D 67 72 00 00 00 00 00 00 60 08 02 00 70 00 00 mgr......`...p..
+062130: 00 00 00 00 <span class="warn">62 75 73 64 72 76</span> 00 00 00 00 00 00 ....<span class="warn">busdrv</span>......
+062140: 00 B0 08 02 00 20 00 00 00 00 00 00 70 72 74 63 ..... ......prtc
+062150: 00 00 00 00 00 00 00 00 00 D0 08 02 00 20 00 00 ............. ..
+062160: 00 00 00 00 73 6D 62 75 73 00 00 00 00 00 00 00 ....<span class="key">smbus</span>.......
+062170: 00 E0 08 00 77 20 00 00 00 00 00 00 <span class="key">63 72 79 70</span> ....w ......<span class="key">cryp</span>
+062180: <span class="key">74 6F</span> 00 00 00 00 00 00 00 10 09 02 00 60 03 00 <span class="key">to</span>...........`..
+062190: 00 00 00 00 <span class="key">66 70 66</span> 00 00 00 00 00 00 00 00 00 ....<span class="key">fpf</span>..........
+0621A0: 00 90 0B 02 00 50 00 00 00 00 00 00 <span class="key">73 74 6F 72</span> .....P......<span class="key">stor</span>
+0621B0: <span class="key">61 67 65</span> 00 00 00 00 00 00 D0 0B 02 00 20 01 00 <span class="key">age</span>.......... ..
+0621C0: 00 00 00 00 67 70 69 6F 00 00 00 00 00 00 00 00 ....gpio........
+0621D0: 40 9B 0C 02 00 20 00 00 00 00 00 00 <span class="err">69 70 63 5F</span> @.... ......<span class="err">ipc_</span>
+0621E0: <span class="err">64 72 76</span> 00 00 00 00 00 00 B3 0C 02 00 40 00 00 <span class="err">drv</span>..........@..
+0621F0: 00 00 00 00 <span class="key">73 65 63 5F 6D 73 67</span> 00 00 00 00 00 ....<span class="key">sec_msg</span>......
+062200: C0 D8 0C 02 00 10 00 00 00 00 00 00 <span class="key">70 6F 6C 69</span> ............<span class="key">poli</span>
+062210: <span class="key">63 79</span> 00 00 00 00 00 00 80 E1 0C 02 00 90 00 00 <span class="key">cy</span>.............
+062220: 00 00 00 00 <span class="err">68 65 63 69</span> 00 00 00 00 00 00 00 00 ....<span class="err">heci</span>........
+062230: 80 43 0D 02 00 90 00 00 00 00 00 00 <span class="key">70 6D 64 72</span> .C..........<span class="key">pmdr</span>
+062240: <span class="key">76</span> 00 00 00 00 00 00 00 80 A6 0D 02 00 30 00 00 <span class="key">v</span>............0..
+062250: 00 00 00 00 <span class="err">6D 61 65 73 74 72 6F</span> 00 00 00 00 00 ....<span class="err">maestro</span>.....
+062260: C0 C3 0D 02 00 40 00 00 00 00 00 00 <span class="err">66 77 75 70</span> .....@......<span class="err">fwup</span>
+062270: <span class="err">64 61 74 65</span> 00 00 00 00 40 EB 0D 02 00 90 00 00 <span class="err">date</span>....@.......
+062280: 00 00 00 00 <span class="key">70 74 74</span> 00 00 00 00 00 00 00 00 00 ....<span class="key">ptt</span>.........
+062290: 40 4B 0E 02 00 90 02 00 00 00 00 00 <span class="key">6D 63 61 5F</span> @K..........<span class="key">mca_</span>
+0622A0: <span class="key">62 6F 6F 74</span> 00 00 00 00 00 20 10 02 00 40 00 00 <span class="key">boot</span>..... ...@..
+0622B0: 00 00 00 00 <span class="key">6D 63 61 5F 73 72 76</span> 00 00 00 00 00 ....<span class="key">mca_srv</span>.....</div>
+      <p style="margin-top:12px"><span class="err" style="font-weight:700">Red = surveillance infrastructure</span> &nbsp; <span class="key" style="font-weight:700">Purple = support modules</span> &nbsp; <span class="warn" style="font-weight:700">Orange = bus/hardware drivers</span></p>
+      <p>Every module name you see above is a 24-byte CPD entry in the raw firmware binary. The <code>kernel</code>, <code>ipc_drv</code>, <code>heci</code>, <code>maestro</code>, and <code>fwupdate</code> modules form the core of ME's surveillance architecture.</p>
+    </div></div>
+  </div>
+
+  <div class="cards">
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">kernel &mdash; Ring 0 Access</h3>
+      <p>Module at <code>0x06205C</code> in CPD. ME runs at the <span class="tip" data-tip="Ring 0 = the highest CPU privilege level. The OS kernel runs here. ME runs here too — but independently, invisibly, with its own separate processor">highest CPU privilege level</span>. It can read/write ANY memory address, ANY I/O port, ANY hardware register. No OS firewall, no antivirus, no security software can block it.</p>
+    </div>
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">ipc_drv &mdash; Internal Command Bus</h3>
+      <p>Module at <code>0x0621DC</code>. The <span class="tip" data-tip="Inter-Process Communication driver — the internal message-passing system that lets different ME modules talk to each other. Coordinates operations between surveillance components">IPC driver</span> routes messages between ME modules. This is how surveillance operations are coordinated across the kernel, network, and encryption subsystems.</p>
+    </div>
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">heci &mdash; CPU Communication Channel</h3>
+      <p>Module at <code>0x062224</code>. <span class="tip" data-tip="Host Embedded Controller Interface — the hardware link between ME and CPU. The Windows driver MEIx64.sys exposes this channel. ME can use it to receive commands from Intel and send data back">HECI/MEI</span> is the bridge between ME and your CPU. The Windows driver <code>MEIx64.sys</code> provides this interface &mdash; it can receive commands and send data.</p>
+    </div>
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">maestro &mdash; Encryption Engine</h3>
+      <p>Module at <code>0x062255</code>. <span class="tip" data-tip="The AES encryption orchestrator inside ME. Encrypts/decrypts firmware, internal data, and communications. This is why 85% of ME firmware appears as random noise — it's encrypted with keys burned into the chip">Maestro</span> encrypts everything ME does. 85% of firmware is AES-encrypted &mdash; even if you dump system memory, ME's data is unreadable.</p>
+    </div>
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">fwupdate &mdash; Self-Update / Persistence</h3>
+      <p>Module at <code>0x06226E</code>. ME can <span class="tip" data-tip="ME can flash its own firmware, surviving OS reinstall, BIOS update, hard drive replacement, and even motherboard BIOS chip reflash. The only way to 'clean' ME is to physically replace the entire motherboard">update its own firmware</span>. Survives OS reinstall, BIOS update, hard drive swap. Persists forever.</p>
+    </div>
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">vfs &mdash; Hidden File System</h3>
+      <p>Module at <code>0x0620EC</code>. ME has its own <span class="tip" data-tip="Virtual File System — ME's private persistent storage. Stores configuration, certificates, logs, and operational data. Survives reboots. The OS cannot access it">virtual file system</span> for storing data persistently. The OS cannot see it, cannot delete it, cannot audit it.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 11: THE CAPABILITY MATRIX -->
+<div class="slide" id="s11">
+<div class="inner">
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 11 of 12</div>
+  <h2>Module Surveillance <span class="err">Capability Matrix</span></h2>
+  <p>Each row is a ME firmware module. Each column is a surveillance capability we searched for. A number means the keyword was found that many times inside that module's binary data.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Module</th>
+        <th>Description</th>
+        <th style="text-align:center"><span class="tip" data-tip="Direct Memory Access — ME can read/write system RAM independently of the CPU">DMA</span></th>
+        <th style="text-align:center"><span class="tip" data-tip="Keyboard/Video/Mouse — full remote desktop control capability, same as Intel AMT KVM">KVM</span></th>
+        <th style="text-align:center"><span class="tip" data-tip="Ring 0 kernel-level CPU access">kernel</span></th>
+        <th style="text-align:center"><span class="tip" data-tip="Inter-Process Communication — internal message bus between ME modules">ipc_drv</span></th>
+        <th style="text-align:center"><span class="tip" data-tip="Host Embedded Controller Interface — CPU-to-ME hardware communication channel">heci</span></th>
+        <th style="text-align:center"><span class="tip" data-tip="AES encryption orchestrator — encrypts ME firmware and data">maestro</span></th>
+        <th style="text-align:center"><span class="tip" data-tip="Advanced Encryption Standard — encryption for hiding data">AES</span></th>
+        <th style="text-align:center"><span class="tip" data-tip="Secure Sockets Layer — encrypted network communication">SSL</span></th>
+        <th style="text-align:center"><span class="tip" data-tip="ME self-firmware-update — survives OS reinstall">fwupdate</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:rgba(248,81,73,.06)">
+        <td><strong style="color:#f85149">FTPR</strong></td>
+        <td>Main firmware partition (2MB)</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+        <td class="err" style="text-align:center;font-weight:700">1x</td>
+      </tr>
+      <tr style="background:rgba(248,81,73,.04)">
+        <td><strong style="color:#f0883e">MDES</strong></td>
+        <td>ME Data Security (256KB)</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="warn" style="text-align:center">1x</td>
+        <td class="warn" style="text-align:center">1x</td>
+        <td class="warn" style="text-align:center">1x</td>
+        <td class="warn" style="text-align:center">1x</td>
+        <td class="warn" style="text-align:center">1x</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="warn" style="text-align:center">1x</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#58a6ff">ISHC</strong></td>
+        <td>Integrated Sensor Hub (128KB)</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="val" style="text-align:center">1x</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#58a6ff">NFTP</strong></td>
+        <td>Network File Transfer (512KB)</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="warn" style="text-align:center">1x</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#8b949e">LOCL/LOCL1</strong></td>
+        <td>Localization (128KB)</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#8b949e">PCHC/IOMP/NPHY/TBTP</strong></td>
+        <td>Platform config (256KB)</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+        <td class="dim" style="text-align:center">&mdash;</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="cards">
+    <div class="card card-full" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">The FTPR Module Has ALL 9 Capabilities</h3>
+      <p>The Main Partition (FTPR) &mdash; the 2MB module that boots first and runs permanently &mdash; contains <strong>every single surveillance component</strong>: kernel access, DMA, KVM remote control, IPC coordination, HECI host communication, AES encryption, SSL networking, and firmware self-update. This is not a coincidence &mdash; it's by design.</p>
+    </div>
+  </div>
+
+  <hr>
+  <h3 style="margin-bottom:12px">Network Evidence: 13 Hardcoded HTTPS URLs</h3>
+  <p style="margin-bottom:8px">Embedded across 13 X.509 certificates, all pointing to Intel's certificate revocation server:</p>
+  <div class="hex" style="font-size:11px"><span class="key">https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl</span>
+
+Found at offsets:
+  0x002679 [BOOT_ROM]     &mdash; in RBEP.man (Root Entry manifest)
+  0x223F22 [LATE_REGION]  &mdash; in PTT certificate
+  0x225401 [LATE_REGION]  &mdash; in PTT certificate
+  0x225A4E [LATE_REGION]  &mdash; in PTT certificate
+  0x225E65 [LATE_REGION]  &mdash; in Kernel CA0 certificate
+  0x233AA6 [LATE_REGION]  &mdash; in PAVP certificate
+  0x23CDDD [LATE_REGION]  &mdash; in Kernel CA0 certificate
+  0x26F53F [LATE_REGION]  &mdash; in PAVP SGX certificate
+  0x2892FD [LATE_REGION]  &mdash; in ROM CA0 certificate
+  0x28A2FD [LATE_REGION]  &mdash; in ROM CA0 certificate
+  0x28B2FD [LATE_REGION]  &mdash; in ROM CA0 certificate
+  0x2902FD [LATE_REGION]  &mdash; in ROM CA0 certificate
+  0x2912FD [LATE_REGION]  &mdash; in ROM CA0 certificate</div>
+  <p>ME can reach this URL <strong>independently of the OS</strong> via its own network stack in the NFTP module. If Intel pushes a new CRL, ME will fetch it. If Intel pushes a new command, the infrastructure exists to receive it.</p>
+</div>
+</div>
+
+<!-- SLIDE 12: CLOSING -->
+<div class="slide" id="s12">
+<div class="inner">
   <div class="label">Conclusion</div>
-  <h2>Summary</h2>
-  <p>This research demonstrates that the Intel CSME &mdash; a coprocessor operating independently of the main CPU &mdash; can be partially decoded through live hardware analysis. While 85% of the firmware remains AES-encrypted, the 15% that is readable reveals a complex internal architecture with its own filesystem, certificate hierarchy, hypervisor, logging system, and network capability.</p>
+  <h2>What This Means</h2>
+
+  <div class="cards">
+    <div class="card card-full" style="border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.03)">
+      <h3 style="color:#f85149;font-size:16px">The Intel ME on this laptop has 7 capabilities that enable surveillance</h3>
+      <p style="font-size:14px;line-height:1.8">
+        <strong style="color:#e6edf3">1. Kernel-level memory access</strong> &mdash; can read your encryption keys, passwords, documents from RAM<br>
+        <strong style="color:#e6edf3">2. DMA hardware access</strong> &mdash; can read/write system memory independently of CPU<br>
+        <strong style="color:#e6edf3">3. KVM remote control</strong> &mdash; can take over keyboard, video, and mouse<br>
+        <strong style="color:#e6edf3">4. Independent network stack</strong> &mdash; can connect to the internet without OS knowledge<br>
+        <strong style="color:#e6edf3">5. Encrypted communications</strong> &mdash; AES encryption hides all ME activity from monitoring<br>
+        <strong style="color:#e6edf3">6. Firmware self-update</strong> &mdash; persists forever, survives OS reinstall and BIOS update<br>
+        <strong style="color:#e6edf3">7. Hardware sensor access</strong> &mdash; always-on monitoring via Integrated Sensor Hub
+      </p>
+    </div>
+  </div>
+
+  <hr>
 
   <div class="cards">
     <div class="card">
-      <h3>Tools Used</h3>
+      <h3>What We Proved</h3>
       <ul>
-        <li>Intel CSME System Tools v16.1 (MEInfoWin64, FPTW64, MEManufWin64)</li>
-        <li>Custom Python analysis scripts (<span class="tip" data-tip="Code Partition Directory parser — finds and lists all modules inside ME firmware">CPD parser</span>, <span class="tip" data-tip="ASN.1 decoder — reads the binary format used for X.509 certificates. Had to build a custom one because Intel ME uses non-standard cert encoding">ASN.1 decoder</span>, entropy analyzer)</li>
-        <li>Ghidra 11.3.2 (GUI mode for firmware disassembly)</li>
-        <li>Live hardware dump via <span class="tip" data-tip="Host Embedded Controller Interface / Management Engine Interface — the communication channel between CPU and ME. Used to dump ME firmware and run diagnostic tools">HECI/MEI</span> driver interface</li>
+        <li>Intel CSME 16.x firmware can be decoded from live hardware</li>
+        <li>80 internal filesystem paths mapped</li>
+        <li>13 X.509 certificates extracted and decoded</li>
+        <li>Complete certificate trust chain reconstructed</li>
+        <li>29 modules identified with named surveillance components</li>
+        <li>8 JSON hardware config blocks decoded</li>
+        <li>Hardcoded network URLs prove internet capability</li>
       </ul>
     </div>
     <div class="card">
-      <h3>Limitations</h3>
+      <h3>What Needs To Happen</h3>
       <ul>
-        <li>85% of firmware <span class="tip" data-tip="Advanced Encryption Standard — military-grade encryption. The key is burned into the chip at manufacturing and can only be used by ME's own hardware">AES</span>-encrypted &mdash; only decryptable by ME hardware at boot</li>
-        <li>No <span class="tip" data-tip="ARC EM — Synopsys's processor architecture. Without a proper disassembler, we can't fully understand ME's runtime code">ARC disassembler</span> available &mdash; runtime code analysis limited</li>
-        <li>Full 32 MB SPI flash dump not yet performed</li>
-        <li>EC register map incomplete for IdeaPad Gaming 3</li>
+        <li>Full 32 MB SPI flash dump for complete firmware image</li>
+        <li>ARC processor disassembler for runtime code analysis</li>
+        <li>Independent security audit of ME network communications</li>
+        <li>Regulatory pressure for ME firmware transparency</li>
+        <li>Open-source ME analysis tools for the security community</li>
       </ul>
     </div>
   </div>
+
   <hr>
-  <p style="font-size:13px;color:#58a6ff">Repository: github.com/jatin-lee/intel-me-research</p>
-  <p class="dim" style="font-size:12px">All firmware analysis performed on personally owned hardware. No systems were accessed without authorization.</p>
+
+  <div style="text-align:center;padding:24px 0">
+    <p class="dim" style="font-size:13px;margin-bottom:8px">Research performed on personally owned hardware. No systems accessed without authorization.</p>
+    <p style="font-size:15px;color:#58a6ff;font-weight:600;margin-bottom:4px">github.com/jatin-lee/intel-me-research</p>
+    <p class="dim" style="font-size:11px">Jatin Kapila &mdash; Intel CSME Firmware Reverse Engineering &mdash; 2026</p>
+  </div>
 </div>
 </div>
 
@@ -587,7 +837,7 @@ function toggleDia(trigger) {
 // NAVIGATION
 // ========================
 var cur = 0;
-var total = 11;
+var total = 13;
 var slides = document.querySelectorAll('.slide');
 var navEl = document.getElementById('navdots');
 

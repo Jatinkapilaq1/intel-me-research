@@ -1,0 +1,360 @@
+Intel ME Surveillance Capability Scanner
+Scan started: 2026-07-28T15:24:44.228734
+Target: J:\HackingTools\BIOS\live_dump\ME_region.bin
+
+    MD5 region check: first 16 bytes = ffffffffffffffffffffffffffffffff
+
+
+  [COMMAND_CONTROL] (Severity: 9/10, 35 hits)
+  ----------------------------------------------------------------------
+    "C2" -> 35x  [encrypted:25 unencrypted:7 other:3]
+      offset 0x0001625A [ENCRYPTED(ROM)]
+      offset 0x0006A07F [ENCRYPTED(ROM)]
+      offset 0x0007195E [ENCRYPTED(ROM)]
+      offset 0x000C3A30 [ENCRYPTED(ROM)]
+      offset 0x000C9AC2 [ENCRYPTED(ROM)]
+      offset 0x000C9ACE [ENCRYPTED(ROM)]
+      offset 0x000CA037 [ENCRYPTED(ROM)]
+      offset 0x000DBE3F [ENCRYPTED(ROM)]
+      offset 0x000E2696 [ENCRYPTED(ROM)]
+      offset 0x000E2BA0 [ENCRYPTED(ROM)]
+      ... and 25 more occurrences
+
+  [NETWORK_COMMUNICATION] (Severity: 7/10, 13 hits)
+  ----------------------------------------------------------------------
+    "http" -> 13x  [encrypted:1 unencrypted:0 other:12]
+      offset 0x00002679 [ENCRYPTED(ROM)]
+      offset 0x00223F22 [OTHER(0x223F22)]
+      offset 0x00225401 [OTHER(0x225401)]
+      offset 0x00225A4E [OTHER(0x225A4E)]
+      offset 0x00225E65 [OTHER(0x225E65)]
+      offset 0x00233AA6 [OTHER(0x233AA6)]
+      offset 0x0023CDDD [OTHER(0x23CDDD)]
+      offset 0x0026F53F [OTHER(0x26F53F)]
+      offset 0x002892FD [OTHER(0x2892FD)]
+      offset 0x0028A2FD [OTHER(0x28A2FD)]
+      ... and 3 more occurrences
+
+  [INTEL_ME_NETWORK_APIS] (Severity: 8/10, 2 hits)
+  ----------------------------------------------------------------------
+    "ipc_drv" -> 1x  [encrypted:1 unencrypted:0 other:0]
+      offset 0x000621DC [ENCRYPTED(ROM)]
+    "KVM" -> 1x  [encrypted:1 unencrypted:0 other:0]
+      offset 0x000A32A8 [ENCRYPTED(ROM)]
+
+  [MEMORY_ACCESS] (Severity: 8/10, 1 hits)
+  ----------------------------------------------------------------------
+    "DMA" -> 1x  [encrypted:1 unencrypted:1 other:-1]
+      offset 0x001C5F43 [UNENCRYPTED(RAM)]
+
+  [ENCRYPTION_EXFIL] (Severity: 6/10, 1 hits)
+  ----------------------------------------------------------------------
+    "TLS" -> 1x  [encrypted:0 unencrypted:0 other:1]
+      offset 0x0029C539 [OTHER(0x29C539)]
+  Found 718 printable strings in unencrypted ARC code region
+
+  Strings by surveillance category:
+    NETWORK_COMMUNICATION: 1 strings
+    PRIVACY_INVASIVE: 1 strings
+    MEMORY_ACCESS: 1 strings
+    RUNTIME_HOOKS: 1 strings
+
+  Sample strings (first 100):
+    0x0013585B: &5JPPf
+    0x001359DD: %1%%ZTH
+    0x00135BAA: -'q&.*
+    0x00135BB2: $q|ITAq
+    0x00135F11: ||||||H
+    0x00135F48: vvvvvvA
+    0x00135F65: vvvvvvDb1
+    0x0013622B: [C\h_A
+    0x0013652C: >,%;R!
+    0x0013670C: z!_@}7^
+    0x00136753: )5T<`}-
+    0x00136824: &oO/Y1
+    0x00136C58: t&>O1r
+    0x0013710D: ,&o/Y1
+    0x00137532: =['x.n'
+    0x001378DA: Iw>AcRr
+    0x0013791C: L&o/Y1
+    0x0013793E: 'RIP$L;
+    0x00137A4D: @7o26Rv
+    0x00137A6E: [roP&*
+    0x00137B35: ehGn_`m
+    0x00137E14: +J>9&?
+    0x001381B5: Yxqfxn
+    0x0013822A: O%G^D=
+    0x00138651: XwPz!d
+    0x001386EF: x]"420
+    0x001387A8: .V^,&o*
+    0x00138A4F: ,&o/Y1
+    0x00138B1A: {{=Zq+
+    0x00138D19: #{EZ8s
+    0x00138E8D: ,&o/Y1
+    0x00138E97: s{EZP9
+    0x00138F19: fbO'.p
+    0x00138F28: ,&o/Y1
+    0x0013907E: Y:6\O2
+    0x001395A0: qDuNpfr
+    0x001396A6: (CTJd=
+    0x00139A7A: @c?x$L<"
+    0x00139ADA: -eL-f=
+    0x00139E5F: x[~{QY2>
+    0x0013A02E: 6TQOi&3
+    0x0013A084: T_`_;9n
+    0x0013A117: n""gQ4
+    0x0013A296: L&o)^B
+    0x0013A679: N\O3(G
+    0x0013A6F7: lH)6Ma
+    0x0013A7E4: ,&o/Y1
+    0x0013A896: 6b,(|.
+    0x0013ACE9: Y"-6W.
+    0x0013ADA7: k A"zy1
+    0x0013AEDF: DJ[+zH
+    0x0013AF88: .V^,&o/Z
+    0x0013AFE6: (Et(jD
+    0x0013B348: fY&IPm
+    0x0013B60D: ,&o/Y1
+    0x0013BD6A: P$J)@tk1
+    0x0013BFB0: g@u^n%G?
+    0x0013C6FA: ;BFgt ]Y%
+    0x0013C705: Ak$E&ep
+    0x0013C748: GB#BFgt$f'BFf
+    0x0013C756: $faBFf
+    0x0013C88C: 7VhS/Z
+    0x0013CAC0: i$Of_B
+    0x0013CCF0: AwDhSS
+    0x0013CF8F: EQVhC(
+    0x0013D08E: V=uNDXe
+    0x0013D31C: iQ -YJ
+    0x0013D499: ;.j"kDMI
+    0x0013D5B9: ~K7.9b
+    0x0013D6EF: ot1=uF?
+    0x0013D6F7: uA8t{St
+    0x0013D70F: Vh@a0>
+    0x0013D99D: Vt{t5<5Hi
+    0x0013DB26: DhI]%jt{=
+    0x0013DD66: "e$+wek-y
+    0x0013DED7: ?`{gKMe
+    0x0013E080: %%ZT|7
+    0x0013E80A: MX`%bj
+    0x0013E890: 4Aot-bj
+    0x0013E907: n;Z4'_
+    0x0013EC37: 8yn1pqA
+    0x0013ED09: +WCFaB
+    0x0013ED74: )l-Exm
+    0x0013F07E: #HuB$x=
+    0x0013F26B: JP{i2u@
+    0x0013F314: b~J4 !
+    0x0013F470: 4hA)a :
+    0x0013F4B9: "Fo$Udh
+    0x0013F648: 4.1jtep
+    0x0013F990: Ba*BM4
+    0x0013FF1F: #(#KVh
+    0x00140244: d~A`5~
+    0x0014033C: *'(_7#F
+    0x00140C32: 3aBFl(H
+    0x00140D49: ,LlclPdJ+
+    0x00140F03: Iy~gQ)
+    0x00141027: ;eqfqn8
+    0x001416A3: ?Y!].%
+    0x00141DAB: i(aJX=
+    0x00141E10: itM)I1
+    ... (618 more strings)
+  Found 1 function prologues in unencrypted region
+    0x0015F19F: 558bec
+  Found 14 syscall-like instructions (int 0x80 / sysenter)
+    0x0013AD99: 83eb3e7e|0f056049
+    0x0014492F: 1054d92e|0f0558a0
+    0x00146E54: a2cce5f4|cd803765
+    0x00151809: 927a70c3|cd80b563
+    0x001564ED: b0f92983|0f051223
+    0x00158148: 90776bfa|0f050834
+    0x00159474: 0d7a86b1|cd809edb
+    0x0019C0A4: 36810020|0f05ccca
+    0x001A1793: 06120c03|cd800b06
+    0x001B5DD3: 42a0ff49|0f051002
+    0x001B73B4: f2cf483d|0f054b01
+    0x001B83F1: c2211200|0f05f0ff
+    0x001B8D9F: 020cf42d|0f0593fe
+    0x001C55F2: c9000001|0f050000
+  Found 13 URLs
+    0x00002679 [ENCRYPTED(ROM)]: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+    0x00223F22 [OTHER(0x223F22)]: https://tsci.intel.com/con
+    0x00225401 [OTHER(0x225401)]: https://tsci.intel.com/content/OnDieC
+    0x00225A4E [OTHER(0x225A4E)]: https://:8tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+    0x00225E65 [OTHER(0x225E65)]: https://tsci.inte
+    0x00233AA6 [OTHER(0x233AA6)]: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2
+    0x0023CDDD [OTHER(0x23CDDD)]: https://tsci.inte~
+    0x0026F53F [OTHER(0x26F53F)]: https://tsci.intel.com/content/OnDieCA/crls/ODCA_g
+    0x002892FD [OTHER(0x2892FD)]: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+    0x0028A2FD [OTHER(0x28A2FD)]: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+    0x0028B2FD [OTHER(0x28B2FD)]: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+    0x002902FD [OTHER(0x2902FD)]: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+    0x002912FD [OTHER(0x2912FD)]: https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+  Found 1 unique IP addresses
+    1.0.2.5 (x1) at: 0x0029C18E
+  Found 85 potential domain names
+    0x00002014 [ENCRYPTED(ROM)]: RBEP.man
+    0x00002044 [ENCRYPTED(ROM)]: rbe.met
+    0x00002681 [ENCRYPTED(ROM)]: tsci.intel.com
+    0x000026B3 [ENCRYPTED(ROM)]: Indirect.crl
+    0x000026F8 [ENCRYPTED(ROM)]: www.intel.com
+    0x00022014 [ENCRYPTED(ROM)]: PMCP.man
+    0x00022044 [ENCRYPTED(ROM)]: PMCC000.met
+    0x00022074 [ENCRYPTED(ROM)]: FIVR.met
+    0x000220A4 [ENCRYPTED(ROM)]: ConstDat.met
+    0x000220D4 [ENCRYPTED(ROM)]: ERTABLE.met
+    0x00062014 [ENCRYPTED(ROM)]: FTPR.man
+    0x0006202C [ENCRYPTED(ROM)]: rot.key
+    0x00062044 [ENCRYPTED(ROM)]: fitc.cfg
+    0x000620A4 [ENCRYPTED(ROM)]: intl.cfg
+    0x000620BC [ENCRYPTED(ROM)]: intl.cfg.met
+    0x000A8A74 [ENCRYPTED(ROM)]: G6B.zx
+    0x000C2F75 [ENCRYPTED(ROM)]: XO.OGE
+    0x001077A2 [ENCRYPTED(ROM)]: Gi.sQF
+    0x001309B1 [ENCRYPTED(ROM)]: Z8.vdB
+    0x001512F0 [UNENCRYPTED(RAM)]: TU.aLn
+    0x0016227D [UNENCRYPTED(RAM)]: KH.WGGc
+    0x00198014 [UNENCRYPTED(RAM)]: IOMP.man
+    0x0019802C [UNENCRYPTED(RAM)]: iom.met
+    0x0019805C [UNENCRYPTED(RAM)]: iom.cd
+    0x00198074 [UNENCRYPTED(RAM)]: iom.hwcd
+    0x001AF014 [UNENCRYPTED(RAM)]: NPHY.man
+    0x001AF0A4 [UNENCRYPTED(RAM)]: gen5.met
+    0x001AF0D4 [UNENCRYPTED(RAM)]: nphy.met
+    0x001BCCF1 [UNENCRYPTED(RAM)]: R.BPPtB.Bb
+    0x001C5014 [UNENCRYPTED(RAM)]: TBTP.man
+    0x001C502C [UNENCRYPTED(RAM)]: tbt.met
+    0x00211014 [OTHER(0x211014)]: PCHC.man
+    0x00211044 [OTHER(0x211044)]: IntelRec.met
+    0x00211074 [OTHER(0x211074)]: IntelCIT.met
+    0x0021BDB1 [OTHER(0x21BDB1)]: lOt.hd
+    0x00225AD1 [OTHER(0x225AD1)]: www.intelEI.com
+    0x00225E6D [OTHER(0x225E6D)]: tsci.inte
+    0x0023EEB6 [OTHER(0x23EEB6)]: o.pNvL
+    0x0029C14D [OTHER(0x29C14D)]: straps.xml
+    0x002A2014 [OTHER(0x2A2014)]: NFTP.man
+    0x002C0477 [OTHER(0x2C0477)]: Y.qsgF
+    0x002FF5F1 [OTHER(0x2FF5F1)]: ya.fLcXl
+    0x0031551D [OTHER(0x31551D)]: qq.Tys
+    0x00329425 [OTHER(0x329425)]: ldi.LAl
+    0x0034AB81 [OTHER(0x34AB81)]: u.WGvD
+  Found 11 occurrences of 'tsci.intel.com'
+
+  Occurrence 1 at offset 0x00002681 [ENCRYPTED(ROM)]:
+    ASCII context (50 bytes before + after):
+    ...0...U...........0....U.....0..0...J.H.Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl.D
+    Hex context:
+    0101ff300e0603551d0f0101ff0404030202ac3081a00603551d1f0481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f4341325f43
+    534d455f496e6469726563742e63726ca244
+
+  Occurrence 2 at offset 0x00223F2A [OTHER(0x223F2A)]:
+    ASCII context (50 bytes before + after):
+    .0.)...U.......... 0....U.....0..0...J.H.Fhttps://tsci.intel.com/con..tent/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl
+    Hex context:
+    0030fa290e0603551d0f0101ff0404030205203081a00603551d1f0481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e12de74656e742f4f6e44696543412f63726c732f4f4443415f434132
+    5f43534d455f496e6469726563742e63726c
+
+  Occurrence 3 at offset 0x00225409 [OTHER(0x225409)]:
+    ASCII context (50 bytes before + after):
+    .0...U........X....0....U.....0..0...J.H.Fhttps://tsci.intel.com/content/OnDieC..A/crls/ODCA_CA2_CSME_Indirect.crl
+    Hex context:
+    00300e0603551d0f0101ff0404da58030203083081a00603551d1f0481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543b7ab412f63726c732f4f4443415f434132
+    5f43534d455f496e6469726563742e63726c
+
+  Occurrence 4 at offset 0x00225A58 [OTHER(0x225A58)]:
+    ASCII context (50 bytes before + after):
+    .0...U...........0....U.....0..0...J.H.Fhttps://:8tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl.D
+    Hex context:
+    00300e0603551d0f0101ff0404030203083081a00603551d1f04819830819530
+    8192a04aa048864668747470733a2f2f3a38747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f4341325f43
+    534d455f496e6469726563742e63726ca244
+
+  Occurrence 5 at offset 0x00233AAE [OTHER(0x233AAE)]:
+    ASCII context (50 bytes before + after):
+    .0...U...........0....U......Q0..0...J.H.Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2.*_CSME_Indirect.crl
+    Hex context:
+    00300e0603551d0f0101ff0404030203c83081a00603551d1f048198f1513081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f434132e02a
+    5f43534d455f496e6469726563742e63726c
+
+  Occurrence 6 at offset 0x0026F547 [OTHER(0x26F547)]:
+    ASCII context (50 bytes before + after):
+    .0...U...........0....U.......0..0...J.H.Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_g.CA2_CSME_Indirect.crl
+    Hex context:
+    00300e0603551d0f0101ff0404030203c83081a00603551d1f8df00481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f67d7434132
+    5f43534d455f496e6469726563742e63726c
+
+  Occurrence 7 at offset 0x00289305 [OTHER(0x289305)]:
+    ASCII context (50 bytes before + after):
+    ...0...U...........0....U.....0..0...J.H.Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl.D
+    Hex context:
+    0101ff300e0603551d0f0101ff0404030202ac3081a00603551d1f0481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f4341325f43
+    534d455f496e6469726563742e63726ca244
+
+  Occurrence 8 at offset 0x0028A305 [OTHER(0x28A305)]:
+    ASCII context (50 bytes before + after):
+    ...0...U...........0....U.....0..0...J.H.Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl.D
+    Hex context:
+    0101ff300e0603551d0f0101ff0404030202ac3081a00603551d1f0481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f4341325f43
+    534d455f496e6469726563742e63726ca244
+
+  Occurrence 9 at offset 0x0028B305 [OTHER(0x28B305)]:
+    ASCII context (50 bytes before + after):
+    ...0...U...........0....U.....0..0...J.H.Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl.D
+    Hex context:
+    0101ff300e0603551d0f0101ff0404030202ac3081a00603551d1f0481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f4341325f43
+    534d455f496e6469726563742e63726ca244
+
+  Occurrence 10 at offset 0x00290305 [OTHER(0x290305)]:
+    ASCII context (50 bytes before + after):
+    ...0...U...........0....U.....0..0...J.H.Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl.D
+    Hex context:
+    0101ff300e0603551d0f0101ff0404030202ac3081a00603551d1f0481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f4341325f43
+    534d455f496e6469726563742e63726ca244
+
+  Occurrence 11 at offset 0x00291305 [OTHER(0x291305)]:
+    ASCII context (50 bytes before + after):
+    ...0...U...........0....U.....0..0...J.H.Fhttps://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl.D
+    Hex context:
+    0101ff300e0603551d0f0101ff0404030202ac3081a00603551d1f0481983081
+    95308192a04aa048864668747470733a2f2f747363692e696e74656c2e636f6d
+    2f636f6e74656e742f4f6e44696543412f63726c732f4f4443415f4341325f43
+    534d455f496e6469726563742e63726ca244
+  Category                       Hits   Severity   Weighted Score
+  --------------------------------------------------------------
+  COMMAND_CONTROL                  35          9/10              315
+  NETWORK_COMMUNICATION            13          7/10               91
+  INTEL_ME_NETWORK_APIS             2          8/10               16
+  MEMORY_ACCESS                     1          8/10                8
+  ENCRYPTION_EXFIL                  1          6/10                6
+  --------------------------------------------------------------
+  TOTAL                            52                         436
+
+  Risk Assessment: 
+    >>> MODERATE: Some surveillance-related patterns found <<<
+  Found 1 surveillance patterns in UNENCRYPTED code region:
+    0x001C5F43 [MEMORY_ACCESS] "DMA"
+      context: .................EE_DMA  ............+.....
+  Completed: 2026-07-28T15:24:45.231558
+  Elapsed: 1.00 seconds
+  Results saved to: J:\HackingTools\intel-me-research\evidence\SURVEILLANCE_RESULTS.txt
