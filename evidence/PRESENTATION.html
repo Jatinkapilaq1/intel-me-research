@@ -73,12 +73,50 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 /* HEX BLOCK */
 .hex{background:#0d1117;border:1px solid #21262d;border-radius:4px;padding:12px 16px;font-family:'SF Mono','Cascadia Code','Consolas',monospace;font-size:11px;color:#8b949e;line-height:1.8;margin-bottom:16px;overflow-x:auto;white-space:pre}
 
+/* TOOLTIPS */
+.tip{position:relative;cursor:help;border-bottom:1px dashed rgba(88,166,255,.35);color:#58a6ff;transition:color .2s}
+.tip:hover{color:#79c0ff}
+.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1c2128;border:1px solid #30363d;border-radius:6px;padding:10px 14px;font-size:11px;color:#c9d1d9;white-space:normal;width:max-content;max-width:340px;z-index:1000;line-height:1.6;box-shadow:0 8px 24px rgba(0,0,0,.5);pointer-events:none;opacity:0;transition:opacity .2s}
+.tip:hover::after{opacity:1}
+.tip-bottom::after{bottom:auto;top:calc(100% + 8px)}
+
+/* EXPANDABLE DIAGRAMS */
+.dia{margin:12px 0}
+.dia-trigger{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:#58a6ff;font-size:12px;font-weight:600;letter-spacing:.5px;padding:6px 12px;border:1px solid rgba(88,166,255,.2);border-radius:4px;background:rgba(88,166,255,.05);transition:all .2s;user-select:none}
+.dia-trigger:hover{background:rgba(88,166,255,.1);border-color:rgba(88,166,255,.3)}
+.dia-trigger .arrow{transition:transform .3s;font-size:10px}
+.dia-trigger.open .arrow{transform:rotate(90deg)}
+.dia-panel{max-height:0;overflow:hidden;transition:max-height .5s ease;background:#0d1117;border:1px solid #21262d;border-radius:6px;margin-top:8px}
+.dia-panel.open{max-height:1200px;border-color:#30363d}
+.dia-inner{padding:20px}
+
+/* DIAGRAM FLOW */
+.flow{display:flex;flex-direction:column;gap:0;font-family:'SF Mono','Cascadia Code','Consolas',monospace;font-size:11px;color:#c9d1d9}
+.flow-node{padding:8px 14px;border-left:3px solid #30363d;background:rgba(22,27,34,.8);position:relative;line-height:1.5}
+.flow-node.root{border-color:#f85149;color:#f85149}
+.flow-node.mid{border-color:#f0883e;color:#f0883e}
+.flow-node.leaf{border-color:#3fb950;color:#3fb950}
+.flow-node.blue{border-color:#58a6ff;color:#58a6ff}
+.flow-node.purple{border-color:#d2a8ff;color:#d2a8ff}
+.flow-arrow{width:1px;height:12px;background:#30363d;margin-left:14px}
+.flow-label{font-size:9px;color:#484f58;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;display:block}
+
+/* SIDE-BY-SIDE DIAGRAM */
+.side-by-side{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+.side-box{border:1px solid #30363d;border-radius:6px;padding:14px;background:#161b22}
+.side-box h4{font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.side-box ul{margin:0;font-size:12px}
+.side-box li{padding:3px 0 3px 12px;font-size:12px;color:#8b949e}
+.side-box li::before{width:4px;height:4px;top:9px}
+
 /* RESPONSIVE */
 @media(max-width:800px){
   .slide{padding:30px 24px}
   h1{font-size:28px}
   h2{font-size:22px}
   .cards{grid-template-columns:1fr}
+  .side-by-side{grid-template-columns:1fr}
+  .tip::after{max-width:260px;left:0;transform:none}
 }
 </style>
 </head>
@@ -94,17 +132,17 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
   <div class="label">Hardware Security Research</div>
   <h1>Complete Decoding of<br>Intel CSME 16.x Firmware</h1>
   <p style="font-size:17px;color:#c9d1d9;margin-top:12px;margin-bottom:24px">
-    A world-first reverse engineering of the hidden coprocessor<br>
-    inside Intel 12th Gen Alder Lake processors.
+    A world-first reverse engineering of the hidden <span class="tip" data-tip="Converged Security and Management Engine — a secret coprocessor inside every Intel chip that runs independently, even when your PC is off">coprocessor</span><br>
+    inside Intel 12th Gen <span class="tip" data-tip="Intel's 12th generation CPU architecture (2021-2022), codenamed after Lake Alder in California">Alder Lake</span> processors.
   </p>
   <hr>
   <table>
     <tr><td class="dim" style="width:160px">Device</td><td>Lenovo IdeaPad Gaming 3 15IAH7 (82S9)</td></tr>
     <tr><td class="dim">Processor</td><td>Intel Core i7-12650H (Alder Lake, 12th Gen)</td></tr>
     <tr><td class="dim">ME Firmware</td><td>CSME ADL SVN01 v16.0.15.1735 LP Consumer</td></tr>
-    <tr><td class="dim">PCH</td><td>Intel ADL Device 5182, Rev A1, SKU: Production PRQ Revenue</td></tr>
-    <tr><td class="dim">SPI Flash</td><td>Winbond W25Q256JV (32 MB)</td></tr>
-    <tr><td class="dim">ME Processor</td><td>Synopsys ARC EM (confirmed via firmware strings)</td></tr>
+    <tr><td class="dim"><span class="tip" data-tip="Platform Controller Hub — the chipset that connects CPU to storage, USB, network, and all peripherals">PCH</span></td><td>Intel ADL Device 5182, Rev A1, SKU: Production PRQ Revenue</td></tr>
+    <tr><td class="dim"><span class="tip" data-tip="Serial Peripheral Interface Flash — the 32MB storage chip soldered to the motherboard that holds all firmware">SPI Flash</span></td><td>Winbond W25Q256JV (32 MB)</td></tr>
+    <tr><td class="dim"><span class="tip" data-tip="Synopsys ARC EM — a tiny, low-power processor core made by Synopsys (not x86 or ARM). This is the CPU inside Intel ME">ME Processor</span></td><td>Synopsys ARC EM (confirmed via firmware strings)</td></tr>
     <tr><td class="dim">ME Image Size</td><td>4,828 KB live firmware dump from hardware</td></tr>
   </table>
   <p class="dim" style="font-size:12px">All analysis performed on live hardware using Intel CSME System Tools v16.1</p>
@@ -116,7 +154,7 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <div class="inner">
   <div class="label">Background</div>
   <h2>What is Intel CSME?</h2>
-  <p>Converged Security and Management Engine &mdash; a dedicated coprocessor embedded in every Intel chipset since 2008. It runs independently of the main CPU, has its own processor, memory, and firmware.</p>
+  <p><span class="tip" data-tip="Converged Security and Management Engine — Intel's name for the hidden coprocessor inside their chips">CSME</span> &mdash; a dedicated <span class="tip" data-tip="A secondary processor that works alongside the main CPU to handle specific tasks — like a helper brain inside your computer">coprocessor</span> embedded in every Intel chipset since 2008. It runs independently of the main CPU, has its own processor, memory, and firmware.</p>
   <div class="cards">
     <div class="card">
       <h3>Runs Even When PC Is Off</h3>
@@ -124,7 +162,7 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
     </div>
     <div class="card">
       <h3>Has Its Own OS</h3>
-      <p>Runs a proprietary RTOS on a Synopsys ARC EM processor. Firmware is 85% AES-encrypted at rest, only decrypted by ME hardware at boot.</p>
+      <p>Runs a proprietary <span class="tip" data-tip="Real-Time Operating System — a lightweight operating system designed to respond instantly, unlike Windows which can lag">RTOS</span> on a <span class="tip" data-tip="Synopsys ARC EM — a tiny, low-power processor core used as the CPU inside Intel ME. Different from the main Intel x86 CPU">Synopsys ARC EM</span> processor. Firmware is 85% <span class="tip" data-tip="Advanced Encryption Standard — military-grade encryption. AES-128 uses a 128-bit key, making it virtually unbreakable without the key">AES</span>-encrypted at rest, only decrypted by ME hardware at boot.</p>
     </div>
     <div class="card">
       <h3>God-Mode Access</h3>
@@ -146,26 +184,26 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <div class="inner">
   <div class="label">Architecture</div>
   <h2>Firmware Filesystem</h2>
-  <p>80 internal IFWI (Intel Firmware Image) paths mapped. 29 modules identified via CPD (Code Partition Directory). First-ever public disclosure of CSME 16.x internal layout.</p>
+  <p>80 internal <span class="tip" data-tip="Intel Firmware Image — the standard container format Intel uses to package firmware. Think of it as a ZIP file for chip firmware">IFWI</span> (Intel Firmware Image) paths mapped. 29 modules identified via <span class="tip" data-tip="Code Partition Directory — the table of contents inside ME firmware that lists every module, like a book's index page">CPD</span> (Code Partition Directory). First-ever public disclosure of CSME 16.x internal layout.</p>
   <div class="hex">ME_region.bin (4,828 KB live dump)
-├── FTPR (Fault Tolerant Partition Recovery)  2,285 KB
+├── <span class="tip tip-bottom" data-tip="Fault Tolerant Partition Recovery — the main boot partition. Contains everything ME needs to start up. Named 'fault tolerant' because it has backup copies for recovery">FTPR</span> (Fault Tolerant Partition Recovery)  2,285 KB
 │   ├── $FPT              Flash Partition Table
 │   ├── FTPR.man          Manifest (AES-encrypted)
 │   ├── rot.key           Root Key
 │   ├── intl.cfg          Internal Config
 │   ├── intl.cfg.met      Config Metadata
-│   └── smbus             SMBus Controller
+│   └── smbus             <span class="tip tip-bottom" data-tip="System Management Bus — a slow, simple wire used to read temperatures, fan speeds, and battery info from hardware sensors">SMBus</span> Controller
 ├── NFTP (Non-FT Partition)           ~1,200 KB
 ├── ISH (Integrated Sensor Hub)       ~400 KB
 ├── Bup (Boot Up)                     ~350 KB
 ├── LOD (LOADER)                      ~300 KB
 ├── PMC (Platform Controller)         ~200 KB
-└── Unencrypted ARC Code              ~836 KB (0x135000-0x1CA000)</div>
+└── <span class="tip tip-bottom" data-tip="ARC EM processor code in plain text — not encrypted. We extracted ~836KB of runtime instructions that ME executes on its Synopsys ARC CPU">Unencrypted ARC Code</span>              ~836 KB (0x135000-0x1CA000)</div>
   <table>
     <tr><th>Property</th><th>Value</th></tr>
-    <tr><td>Total modules (CPD)</td><td class="val">29</td></tr>
+    <tr><td><span class="tip" data-tip="Code Partition Directory — the master index that lists all modules inside ME firmware">Total modules (CPD)</span></td><td class="val">29</td></tr>
     <tr><td>Unique firmware paths</td><td class="val">80</td></tr>
-    <tr><td>Encrypted modules</td><td class="warn">~85% (AES-128-CBC)</td></tr>
+    <tr><td><span class="tip" data-tip="Advanced Encryption Standard with 128-bit keys in Cipher Block Chaining mode — the encryption protecting 85% of ME firmware">Encrypted modules</span></td><td class="warn">~85% (<span class="tip" data-tip="AES-128-CBC — military-grade encryption. The key is burned into the chip at manufacturing and cannot be extracted">AES-128-CBC</span>)</td></tr>
     <tr><td>Readable modules</td><td class="val">~15% (836 KB)</td></tr>
     <tr><td>X.509 certificates</td><td class="val">13 extracted</td></tr>
     <tr><td>JSON config blocks</td><td class="val">8 decoded</td></tr>
@@ -182,35 +220,35 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
   <table>
     <tr><th>Config Block</th><th>Key Data</th></tr>
     <tr>
-      <td><span class="tag tag-blue">Platform ID</span></td>
+      <td><span class="tag tag-blue"><span class="tip" data-tip="A unique code that tells ME exactly which Intel chip revision and model it's running on — like a DNA fingerprint for the silicon">Platform ID</span></span></td>
       <td class="mono">ADL P LP Consumer &mdash; identifies exact silicon revision and SKU tier</td>
     </tr>
     <tr>
-      <td><span class="tag tag-blue">PCH Straps</span></td>
+      <td><span class="tag tag-blue"><span class="tip" data-tip="Hardware configuration pins on the PCH chip that define how it behaves — like jumper settings on old motherboards, but set in silicon">PCH Straps</span></span></td>
       <td class="mono">Device 5182, SPI Controller config, GPIO mapping</td>
     </tr>
     <tr>
-      <td><span class="tag tag-blue">PMC Type-C</span></td>
+      <td><span class="tag tag-blue"><span class="tip" data-tip="Platform Management Controller for USB-C — handles power delivery negotiation so your USB-C port charges safely">PMC Type-C</span></span></td>
       <td class="mono">USB-C PD controller config, power delivery negotiation</td>
     </tr>
     <tr>
-      <td><span class="tag tag-yellow">BootGuard</span></td>
+      <td><span class="tag tag-yellow"><span class="tip" data-tip="Intel's hardware root-of-trust — verifies firmware is genuine before the CPU starts. Like a bouncer checking ID before letting anyone in">BootGuard</span></span></td>
       <td class="mono">Profile 3, Measured Boot enabled, TPM required</td>
     </tr>
     <tr>
-      <td><span class="tag tag-blue">Debug Capability</span></td>
+      <td><span class="tag tag-blue"><span class="tip" data-tip="Direct Connect Interface — a debug port used during manufacturing to test the chip. Locked down on production devices">DCI/Debug</span></span></td>
       <td class="mono">DCI/USB3 debug port config (production locked)</td>
     </tr>
     <tr>
-      <td><span class="tag tag-blue">NFC Config</span></td>
+      <td><span class="tag tag-blue"><span class="tip" data-tip="General Purpose Input/Output — configurable hardware pins that can be programmed to do different tasks like reading buttons or controlling LEDs">GPIO</span></span></td>
       <td class="mono">NFC controller integration parameters</td>
     </tr>
     <tr>
-      <td><span class="tag tag-blue">Thermal</span></td>
+      <td><span class="tag tag-blue"><span class="tip" data-tip="Thermal policy — rules that control when fans spin up and how hot the chip is allowed to get before throttling">Thermal</span></span></td>
       <td class="mono">Thermal policy parameters (EC-controlled on this device)</td>
     </tr>
     <tr>
-      <td><span class="tag tag-blue">Boot Policy</span></td>
+      <td><span class="tag tag-blue"><span class="tip" data-tip="Secure boot chain — the sequence of cryptographic checks that verify each piece of firmware is genuine before it runs">Boot Policy</span></span></td>
       <td class="mono">Secure boot chain, measured boot manifest</td>
     </tr>
   </table>
@@ -225,30 +263,39 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <div class="inner">
   <div class="label">Cryptography</div>
   <h2>Certificate Trust Chain</h2>
-  <p>13 X.509 certificates extracted and decoded. 9 unique by SHA-256 fingerprint. Intel's On-Die CA hierarchy with EC P-384/P-256 and RSA keys.</p>
+  <p>13 <span class="tip" data-tip="X.509 is the global standard for digital certificates — like an ID card for computers. It proves 'this key belongs to this entity' and is signed by a trusted authority">X.509</span> certificates extracted and decoded. 9 unique by <span class="tip" data-tip="SHA-256 — a hash function that creates a unique 256-bit fingerprint. Two different inputs will never produce the same fingerprint">SHA-256</span> fingerprint. Intel's <span class="tip" data-tip="On-Die CA — a Certificate Authority built directly into the silicon chip itself. The root of trust is physically part of the CPU die, not stored in software">On-Die CA</span> hierarchy with EC P-384/P-256 and <span class="tip" data-tip="RSA — the traditional public-key cryptography algorithm named after its inventors Rivest, Shamir, and Adleman. Being replaced by faster elliptic curve math">RSA</span> keys.</p>
 
-  <div class="chain">
-    <div class="chain-node root">ODCA CA2 &mdash; On-Die Chiplet Root CA (Intel silicon root of trust)</div>
-    <div class="chain-arrow"></div>
-    <div class="chain-node inter">ROM CA0 &mdash; ROM-based Certificate Authority (EC P-384)</div>
-    <div class="chain-arrow"></div>
-    <div class="chain-node inter">Kernel CA0 &mdash; Kernel-level Certificate Authority</div>
-    <div class="chain-arrow"></div>
-    <div class="chain-node leaf" style="margin-left:24px">PTT Certificate &mdash; Platform Trust Technology (firmware TPM)</div>
-    <div class="chain-node leaf" style="margin-left:24px">PAVP SGX Certificate &mdash; Protected Audio Video Path + SGX attestation</div>
-    <div class="chain-node leaf" style="margin-left:24px">PAVP Playready Certificate &mdash; Microsoft Playready DRM</div>
+  <div class="dia">
+    <div class="dia-trigger" onclick="toggleDia(this)"><span class="arrow">&#9654;</span> Click to expand: Certificate Trust Chain explained</div>
+    <div class="dia-panel">
+      <div class="dia-inner">
+        <p style="margin-bottom:12px">Think of this like a government ID system. The <span class="tip" data-tip="Root CA — the ultimate authority. Like a country's constitution — everything else derives trust from it">Root CA</span> is the government, <span class="tip" data-tip="Intermediate CA — issues certificates on behalf of the Root. Like a state DMV that issues driver's licenses on behalf of the federal government">Intermediate CAs</span> are the DMVs, and <span class="tip" data-tip="Leaf Certificate — the end-user certificate used for actual operations. Like your driver's license — it proves who you are">leaf certificates</span> are your ID cards.</p>
+        <div class="flow">
+          <div class="flow-node root"><span class="flow-label">Root (On-Die)</span>ODCA CA2 &mdash; On-Die Chiplet Root CA<br><span style="font-size:10px;color:#8b949e">Built into the silicon. Intel's ultimate trust anchor.</span></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node mid"><span class="flow-label">Intermediate (ROM)</span>ROM CA0 &mdash; ROM-based Certificate Authority<br><span style="font-size:10px;color:#8b949e">Stored in read-only memory. EC P-384 key (384-bit elliptic curve).</span></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node mid"><span class="flow-label">Intermediate (Kernel)</span>Kernel CA0 &mdash; Kernel-level Certificate Authority<br><span style="font-size:10px;color:#8b949e">Issues certificates for specific ME subsystems.</span></div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node leaf" style="margin-left:20px"><span class="flow-label">Leaf</span>PTT Certificate &mdash; Platform Trust Technology (firmware TPM)</div>
+          <div class="flow-node leaf" style="margin-left:20px"><span class="flow-label">Leaf</span>PAVP SGX Certificate &mdash; Protected Audio Video Path + SGX</div>
+          <div class="flow-node leaf" style="margin-left:20px"><span class="flow-label">Leaf</span>PAVP Playready Certificate &mdash; Microsoft DRM</div>
+        </div>
+        <p style="margin-top:12px;font-size:11px;color:#8b949e">Each level signs the next. If the Root is trustworthy, everything below it is too. This is how ME proves its firmware is genuine Intel code.</p>
+      </div>
+    </div>
   </div>
 
   <table>
     <tr><th>Certificate</th><th>Type</th><th>Key</th><th>Fingerprint (SHA-256)</th></tr>
-    <tr><td>ROM CA0 (5 copies)</td><td>CA</td><td>EC P-384</td><td class="mono" style="font-size:10px">610cd1c4...12dfefb</td></tr>
-    <tr><td>PTT (RSA)</td><td>Leaf</td><td>RSA</td><td class="mono" style="font-size:10px">f7cce1cd...906d0d7</td></tr>
-    <tr><td>PTT (EC P-256)</td><td>Leaf</td><td>EC P-256</td><td class="mono" style="font-size:10px">6eec5790...329e9a</td></tr>
+    <tr><td><span class="tip" data-tip="ROM-based Certificate Authority — stored in the chip's read-only memory. Issues the Kernel CA certificate. 5 identical copies found in firmware">ROM CA0</span> (5 copies)</td><td>CA</td><td><span class="tip" data-tip="Elliptic Curve P-384 — uses a 384-bit prime field. Much stronger than RSA with smaller keys. Part of NSA's Suite B cryptography">EC P-384</span></td><td class="mono" style="font-size:10px">610cd1c4...12dfefb</td></tr>
+    <tr><td><span class="tip" data-tip="Platform Trust Technology — Intel's firmware-based TPM (Trusted Platform Module). A virtual security chip that stores encryption keys">PTT</span> (RSA)</td><td>Leaf</td><td>RSA</td><td class="mono" style="font-size:10px">f7cce1cd...906d0d7</td></tr>
+    <tr><td><span class="tip" data-tip="Platform Trust Technology using Elliptic Curve P-256 — faster than RSA, used for firmware TPM operations">PTT</span> (EC P-256)</td><td>Leaf</td><td><span class="tip" data-tip="Elliptic Curve P-256 — 256-bit elliptic curve from NSA's Suite B. Used in TLS, Bitcoin, and here in ME certificates">EC P-256</span></td><td class="mono" style="font-size:10px">6eec5790...329e9a</td></tr>
     <tr><td>PTT (EC P-384)</td><td>Leaf</td><td>EC P-384</td><td class="mono" style="font-size:10px">4f2edcfb...a4adf6</td></tr>
     <tr><td>Kernel CA0 &rarr; PTT</td><td>CA &rarr; Leaf</td><td>EC</td><td class="mono" style="font-size:10px">7d42f2f3...ac8aab0</td></tr>
-    <tr><td>PAVP SGX</td><td>Leaf</td><td>EC</td><td class="mono" style="font-size:10px">409a96bc...0977c0e</td></tr>
+    <tr><td><span class="tip" data-tip="Protected Audio Video Path + Software Guard Extensions — protects DRM content (movies, streaming) and provides hardware-isolated secure enclaves">PAVP SGX</span></td><td>Leaf</td><td>EC</td><td class="mono" style="font-size:10px">409a96bc...0977c0e</td></tr>
     <tr><td>Kernel CA0 &rarr; PAVP</td><td>CA &rarr; Leaf</td><td>EC</td><td class="mono" style="font-size:10px">52a237bd...0bd462</td></tr>
-    <tr><td>PAVP Playready</td><td>Leaf</td><td>EC</td><td class="mono" style="font-size:10px">4dd105c1...1aa6ce7</td></tr>
+    <tr><td><span class="tip" data-tip="PAVP Playready — Microsoft's DRM system. This certificate lets ME decrypt protected content like Netflix 4K streams">PAVP Playready</span></td><td>Leaf</td><td>EC</td><td class="mono" style="font-size:10px">4dd105c1...1aa6ce7</td></tr>
   </table>
 </div>
 </div>
@@ -258,21 +305,21 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <div class="inner">
   <div class="label">Network Capability</div>
   <h2>ME Network Stack Evidence</h2>
-  <p>Every certificate contains a CRL (Certificate Revocation List) distribution URL, proving Intel ME has network stack capability for certificate validation.</p>
+  <p>Every certificate contains a <span class="tip" data-tip="Certificate Revocation List — a list of certificates that are no longer trusted (like a 'most wanted' list for bad certificates). ME checks this list over the internet">CRL</span> (Certificate Revocation List) distribution URL, proving Intel ME has network stack capability for certificate validation.</p>
 
   <div class="cards">
     <div class="card card-full">
       <h3>Certificate Revocation List (CRL) URL</h3>
       <div class="hex" style="border-color:rgba(248,81,73,.2)">https://tsci.intel.com/content/OnDieCA/crls/ODCA_CA2_CSME_Indirect.crl</div>
-      <p>Found in all 13 extracted certificates. This URL is embedded in the DER-encoded certificate extensions as a CRL Distribution Point. ME firmware contains the network code to fetch and validate certificate revocation status.</p>
+      <p>Found in all 13 extracted certificates. This URL is embedded in the <span class="tip" data-tip="DER — Distinguished Encoding Rules. The binary format used to encode certificates (as opposed to PEM which is Base64 text). ME uses DER format internally">DER</span>-encoded certificate extensions as a <span class="tip" data-tip="CRL Distribution Point — a field in a certificate that tells you where to download the revocation list. Like a 'check here for updates' URL">CRL Distribution Point</span>. ME firmware contains the network code to fetch and validate certificate revocation status.</p>
     </div>
     <div class="card">
       <h3>Network Stack Indicators</h3>
       <ul>
         <li>14 occurrences of <code>tsci.intel.com</code> URLs across firmware</li>
-        <li><code>ipc_drv</code> string at ME offset 0x0621DC (inter-process communication driver)</li>
+        <li><code>ipc_drv</code> string at ME offset 0x0621DC (<span class="tip" data-tip="Inter-Process Communication Driver — allows different parts of ME software to talk to each other. Suggests ME has multiple internal processes">IPC driver</span>)</li>
         <li>CRL check URL embedded in certificate extensions</li>
-        <li>NCSI/AMT network stack code present in unencrypted regions</li>
+        <li><span class="tip" data-tip="Network Controller Sideband Interface — manages the network card at hardware level, below the OS. ME uses this to access the network independently">NCSI</span>/<span class="tip" data-tip="Intel Active Management Technology — remote management feature that lets admins control PCs over the network. Not present on Consumer SKU, but the network code remains">AMT</span> network stack code present in unencrypted regions</li>
       </ul>
     </div>
     <div class="card">
@@ -293,18 +340,45 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <div class="inner">
   <div class="label">Security Posture</div>
   <h2>8/8 Hardware Security Locks</h2>
-  <p>All security mechanisms verified via MEManufWin64 hardware self-tests. Every lock is PERMANENT and IRREVERSIBLE on this production device.</p>
+  <p>All security mechanisms verified via <span class="tip" data-tip="ME Manufacturing tool — a diagnostic program from Intel that runs hardware self-tests on the Management Engine to verify all security features are working">MEManufWin64</span> hardware self-tests. Every lock is PERMANENT and IRREVERSIBLE on this production device.</p>
+
+  <div class="dia">
+    <div class="dia-trigger" onclick="toggleDia(this)"><span class="arrow">&#9654;</span> Click to expand: How the 8 security locks work together</div>
+    <div class="dia-panel">
+      <div class="dia-inner">
+        <p style="margin-bottom:12px">Each lock reinforces the others. Breaking one doesn't help because the next one still blocks you. It's like a vault with 8 different locks — you need ALL of them open to get in.</p>
+        <div class="flow">
+          <div class="flow-node root"><span class="flow-label">Layer 1</span><span class="tip" data-tip="Intel BootGuard — verifies firmware cryptographic signatures before CPU starts. If verification fails, the system refuses to boot">BootGuard Profile 3</span> &rarr; Blocks unauthorized firmware from running</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node root"><span class="flow-label">Layer 2</span><span class="tip" data-tip="Platform Trust Technology — firmware TPM that stores security keys. If compromised, all encrypted data is at risk">PTT (Firmware TPM)</span> &rarr; Protects encryption keys in hardware</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node mid"><span class="flow-label">Layer 3</span><span class="tip" data-tip="Fuse Policy Fuses — tiny wires inside the chip that are physically burned at the factory. Once burned, they can never be restored">FPF Committed</span> &rarr; Factory-burned fuses cannot be reversed</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node mid"><span class="flow-label">Layer 4</span><span class="tip" data-tip="Flash Protection — the SPI flash chip is write-protected at hardware level. No software can modify the firmware">Flash Protection</span> &rarr; Firmware chip is write-locked</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node mid"><span class="flow-label">Layer 5</span><span class="tip" data-tip="End of Manufacturing — device is permanently sealed at the factory. Debug ports are disabled, all test access is revoked">EOM (End of Manufacturing)</span> &rarr; Device permanently sealed at factory</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node blue"><span class="flow-label">Layer 6</span><span class="tip" data-tip="Firmware Update Disabled — ME refuses to accept new firmware. Even if you had physical access to the chip, you can't update ME">FWUpdate Disabled</span> &rarr; ME firmware update blocked</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node blue"><span class="flow-label">Layer 7</span><span class="tip" data-tip="PCH Unlocked State Disabled — the debug interface is sealed. You can't use Intel's own debug tools to inspect ME">PCH Unlocked</span> &rarr; Debug interfaces sealed</div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node blue"><span class="flow-label">Layer 8</span><span class="tip" data-tip="Flash Protection Range — specific regions of the flash chip are marked as protected. Even the flash descriptor is locked down">Flash Protection Range</span> &rarr; Protected flash regions enforced</div>
+        </div>
+        <p style="margin-top:12px;font-size:11px;color:#8b949e">Result: This laptop's ME firmware is a black box. No software modification is possible through any known method.</p>
+      </div>
+    </div>
+  </div>
 
   <table>
     <tr><th>#</th><th>Security Mechanism</th><th>Status</th><th>Detail</th></tr>
-    <tr><td>1</td><td>BootGuard Profile</td><td class="err">ENABLEED</td><td>Profile 3, Measured Boot, TPM enforcement</td></tr>
-    <tr><td>2</td><td>PTT (Firmware TPM)</td><td class="err">ENABLED</td><td>Platform Trust Technology active</td></tr>
-    <tr><td>3</td><td>FPF Committed</td><td class="err">LOCKED</td><td>Fuse Policy Fuses burned at factory</td></tr>
-    <tr><td>4</td><td>Flash Protection</td><td class="err">LOCKED</td><td>Flash Descriptor write-protected</td></tr>
-    <tr><td>5</td><td>EOM (End of Manufacturing)</td><td class="err">LOCKED</td><td>Device permanently sealed</td></tr>
-    <tr><td>6</td><td>FWUpdate Disabled</td><td class="err">DISABLED</td><td>ME firmware update blocked</td></tr>
-    <tr><td>7</td><td>PCH Unlocked State</td><td class="err">DISABLED</td><td>Debug interfaces sealed</td></tr>
-    <tr><td>8</td><td>Flash Protection Range</td><td class="err">ACTIVE</td><td>Protected flash regions enforced</td></tr>
+    <tr><td>1</td><td><span class="tip" data-tip="Intel BootGuard — hardware root-of-trust that verifies firmware signatures before the CPU starts. Like a bouncer checking your ID at the door">BootGuard Profile</span></td><td class="err">ENABLED</td><td>Profile 3, Measured Boot, TPM enforcement</td></tr>
+    <tr><td>2</td><td><span class="tip" data-tip="Platform Trust Technology — Intel's firmware-based TPM (Trusted Platform Module). Stores encryption keys and verifies system integrity">PTT (Firmware TPM)</span></td><td class="err">ENABLED</td><td>Platform Trust Technology active</td></tr>
+    <tr><td>3</td><td><span class="tip" data-tip="Fuse Policy Fuses — tiny metallic wires inside the chip that are physically melted (burned) at the factory. Once burned, they cannot be restored">FPF Committed</span></td><td class="err">LOCKED</td><td>Fuse Policy Fuses burned at factory</td></tr>
+    <tr><td>4</td><td><span class="tip" data-tip="Flash Protection — the SPI flash chip containing firmware is write-protected at hardware level. No software command can modify it">Flash Protection</span></td><td class="err">LOCKED</td><td>Flash Descriptor write-protected</td></tr>
+    <tr><td>5</td><td><span class="tip" data-tip="End of Manufacturing — the device is permanently sealed at the factory. Debug ports are disabled, test access is revoked forever">EOM (End of Manufacturing)</span></td><td class="err">LOCKED</td><td>Device permanently sealed</td></tr>
+    <tr><td>6</td><td><span class="tip" data-tip="Firmware Update Disabled — ME refuses to accept new firmware updates. Even physical chip access won't help because updates require cryptographic signatures">FWUpdate Disabled</span></td><td class="err">DISABLED</td><td>ME firmware update blocked</td></tr>
+    <tr><td>7</td><td><span class="tip" data-tip="PCH Unlocked State Disabled — debug interfaces are sealed. Intel's own diagnostic tools cannot access ME internals">PCH Unlocked State</span></td><td class="err">DISABLED</td><td>Debug interfaces sealed</td></tr>
+    <tr><td>8</td><td><span class="tip" data-tip="Flash Protection Range — specific regions of the flash chip are hardware-protected. Even the Flash Descriptor (master control table) is locked">Flash Protection Range</span></td><td class="err">ACTIVE</td><td>Protected flash regions enforced</td></tr>
   </table>
 
   <hr>
@@ -333,19 +407,19 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 
   <div class="cards">
     <div class="card">
-      <h3>RomBypass Boot Mechanism</h3>
+      <h3><span class="tip" data-tip="An alternative boot path that bypasses the standard ROM initialization sequence. Like a secret backdoor entrance that skips the normal security checks">RomBypass</span> Boot Mechanism</h3>
       <p>Three structures: RomBypass, RomBypassVector, RomBypassVectorCopy. Defines an alternative boot path that bypasses standard ROM initialization. Located in the boot chain before FPs are validated.</p>
     </div>
     <div class="card">
-      <h3>OverClocking Engine</h3>
-      <p>Internal overclocking management at ME offset 0xCF45C. ME monitors and potentially controls frequency scaling independently of the main CPU's DVFS.</p>
+      <h3><span class="tip" data-tip="Internal overclocking management — ME monitors and controls CPU frequency scaling. This means ME can affect your PC's speed independently">OverClocking Engine</span></h3>
+      <p>Internal overclocking management at ME offset 0xCF45C. ME monitors and potentially controls frequency scaling independently of the main CPU's <span class="tip" data-tip="Dynamic Voltage and Frequency Scaling — the technology that adjusts CPU speed and power in real-time to balance performance and battery life">DVFS</span>.</p>
     </div>
     <div class="card">
-      <h3>ME Logging System (FLOG + ELOG)</h3>
-      <p>Two log types found in DATA_PARTITION. FLOG captures firmware events, ELOG captures error events. Internal audit trail that persists across reboots.</p>
+      <h3>ME Logging System (<span class="tip" data-tip="Firmware Log — records normal ME operations. Like a flight recorder on an airplane that tracks everything the ME does">FLOG</span> + <span class="tip" data-tip="Error Log — records ME errors and failures. When something goes wrong inside ME, ELOG writes down what happened">ELOG</span>)</h3>
+      <p>Two log types found in <span class="tip" data-tip="Data Partition — a section of ME firmware that stores persistent data across reboots, like a hard drive for ME's internal records">DATA_PARTITION</span>. FLOG captures firmware events, ELOG captures error events. Internal audit trail that persists across reboots.</p>
     </div>
     <div class="card">
-      <h3>Hypervisor Policy (HVMP)</h3>
+      <h3><span class="tip" data-tip="Hypervisor Policy — ME runs its own virtualization layer. Like running a virtual machine inside your virtual machine. ME partitions its own execution into isolated domains">Hypervisor Policy (HVMP)</span></h3>
       <p>ME runs its own hypervisor layer. HVMP manages internal virtualization policies &mdash; suggesting ME partitions its own execution environment into isolated domains.</p>
     </div>
   </div>
@@ -353,11 +427,11 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
   <hr>
   <h3>Security Structure Coverage</h3>
   <p>28 of 35 known Intel security structures identified and mapped:</p>
-  <div class="hex">FPFS  EOM    HMRFPO  AltMe   BootGuard  PTT     PAVP    VT-d
-ROMB  ELOG   FLOG    MFS     NVAR     PSVN    UTOK    UEP
-HVMP  IMDP   IVBP    FDCR    CDMD     RSTR    GBST    ISH
-NFTP  FTPR   RBE     OEM_KM  CDMM     MBP     MBX     ACM
-FW_R</div>
+  <div class="hex"><span class="tip" data-tip="Flash Partition File System — ME's internal file system for storing configuration and keys">FPFS</span>  <span class="tip" data-tip="End of Manufacturing — device sealed at factory, all debug access revoked">EOM</span>    <span class="tip" data-tip="Hardware Measurement Root of Flash Protection Override — controls whether flash protection can be bypassed">HMRFPO</span>  <span class="tip" data-tip="Alternate ME — defines fallback behavior if primary ME firmware is corrupted">AltMe</span>   <span class="tip" data-tip="Intel's hardware root-of-trust — verifies firmware before CPU starts">BootGuard</span>  <span class="tip" data-tip="Platform Trust Technology — firmware-based TPM (virtual security chip)">PTT</span>     <span class="tip" data-tip="Protected Audio Video Path — DRM content protection for video/audio streams">PAVP</span>    <span class="tip" data-tip="Virtualization Technology for Directed I/O — controls which devices can access memory directly">VT-d</span>
+<span class="tip" data-tip="ROM Bypass — alternative boot path that skips standard ROM initialization">ROMB</span>  <span class="tip" data-tip="Error Log — records ME errors and failures across reboots">ELOG</span>   <span class="tip" data-tip="Firmware Log — records normal ME operations and events">FLOG</span>    <span class="tip" data-tip="ME File System — the file system ME uses to store persistent data">MFS</span>     <span class="tip" data-tip="Non-Volatile Attribute Record — small storage slots for configuration flags">NVAR</span>    <span class="tip" data-tip="Production SVN — Security Version Number, tracks firmware revision">PSVN</span>    <span class="tip" data-tip="Unit Test Token — used during factory testing to verify ME hardware">UTOK</span>    <span class="tip" data-tip="User Environment Policy — controls what ME is allowed to do at runtime">UEP</span>
+<span class="tip" data-tip="Hypervisor Policy — ME's virtualization manager, partitions execution into isolated domains">HVMP</span>  <span class="tip" data-tip="ME Debug Policy — controls debug access to ME internals">IMDP</span>   <span class="tip" data-tip="Internal Virtualization Boot Policy — defines how ME boots its virtual machines">IVBP</span>    <span class="tip" data-tip="Flash Descriptor Range — defines which flash regions are protected">FDCR</span>    <span class="tip" data-tip="Code Module Descriptor — describes each module in the CPD">CDMD</span>    <span class="tip" data-tip="Reset Policy — defines ME behavior during system resets">RSTR</span>    <span class="tip" data-tip="Global Boot Status — tracks which stage of boot ME has reached">GBST</span>    <span class="tip" data-tip="Integrated Sensor Hub — manages built-in sensors like accelerometer and gyroscope">ISH</span>
+<span class="tip" data-tip="Non-FT Partition — runtime services partition (no backup copies)">NFTP</span>  <span class="tip" data-tip="Fault Tolerant Partition Recovery — main boot partition with backup copies">FTPR</span>   <span class="tip" data-tip="ROM Boot Engine — the first code that runs when ME powers on">RBE</span>     <span class="tip" data-tip="OEM Key Manifest — defines which OEM (Lenovo) keys are trusted">OEM_KM</span>  <span class="tip" data-tip="Code Module Metadata — extra metadata for module loading">CDMM</span>    <span class="tip" data-tip="Manifest Policy — defines how firmware manifests are verified">MBP</span>     <span class="tip" data-tip="Manifest Extension — additional manifest data">MBX</span>     <span class="tip" data-tip="Authenticated Code Module — verified code that runs during early boot">ACM</span>
+<span class="tip" data-tip="Firmware Recovery — defines how ME recovers from corrupted firmware">FW_R</span></div>
 </div>
 </div>
 
@@ -366,21 +440,21 @@ FW_R</div>
 <div class="inner">
   <div class="label">Module Analysis</div>
   <h2>29 CPD Modules</h2>
-  <p>Complete Code Partition Directory analysis from live firmware. Modules categorized by function and encryption status.</p>
+  <p>Complete <span class="tip" data-tip="Code Partition Directory — the table of contents inside ME firmware. Lists every module, its size, and location. Like a book's index page">CPD</span> analysis from live firmware. Modules categorized by function and encryption status.</p>
 
   <table>
     <tr><th>Module</th><th>Size</th><th>Encrypted</th><th>Purpose</th></tr>
-    <tr><td class="key">FTPR</td><td>2,285 KB</td><td class="err">Yes (AES)</td><td>Fault Tolerant Partition Recovery &mdash; main boot module</td></tr>
-    <tr><td class="key">NFTP</td><td>~1,200 KB</td><td class="err">Yes (AES)</td><td>Non-FT Partition &mdash; runtime services</td></tr>
-    <tr><td class="key">ISH</td><td>~400 KB</td><td class="err">Yes (AES)</td><td>Integrated Sensor Hub controller</td></tr>
-    <tr><td class="key">BUP</td><td>~350 KB</td><td class="err">Yes (AES)</td><td>Boot Up &mdash; early initialization</td></tr>
-    <tr><td class="key">LOD</td><td>~300 KB</td><td class="err">Yes (AES)</td><td>Loader &mdash; module dispatcher</td></tr>
-    <tr><td class="key">PMC</td><td>~200 KB</td><td class="err">Yes (AES)</td><td>Platform Controller &mdash; PCH management</td></tr>
-    <tr><td class="key">ARC Code</td><td>~836 KB</td><td class="val">No</td><td>Unencrypted ARC EM runtime code (0x135000-0x1CA000)</td></tr>
-    <tr><td>rot.key</td><td>Small</td><td class="val">No</td><td>Root key for cryptographic operations</td></tr>
-    <tr><td>intl.cfg</td><td>Small</td><td class="val">No</td><td>Internal configuration parameters</td></tr>
-    <tr><td>smbus</td><td>Small</td><td class="val">No</td><td>SMBus controller interface</td></tr>
-    <tr><td>FTPR.man</td><td>Small</td><td class="err">Yes</td><td>Manifest &mdash; module authentication metadata</td></tr>
+    <tr><td class="key"><span class="tip" data-tip="Fault Tolerant Partition Recovery — the main boot module. Contains everything ME needs to start. Has backup copies for recovery if main copy is corrupted">FTPR</span></td><td>2,285 KB</td><td class="err">Yes (AES)</td><td>Fault Tolerant Partition Recovery &mdash; main boot module</td></tr>
+    <tr><td class="key"><span class="tip" data-tip="Non-Fault Tolerant Partition — handles runtime services after boot. Doesn't have backup copies like FTPR does">NFTP</span></td><td>~1,200 KB</td><td class="err">Yes (AES)</td><td>Non-FT Partition &mdash; runtime services</td></tr>
+    <tr><td class="key"><span class="tip" data-tip="Integrated Sensor Hub — manages built-in sensors like accelerometer, gyroscope. Controls laptop features like auto-rotate and wake-on-motion">ISH</span></td><td>~400 KB</td><td class="err">Yes (AES)</td><td>Integrated Sensor Hub controller</td></tr>
+    <tr><td class="key"><span class="tip" data-tip="Boot Up — the first module that runs during ME startup. Initializes hardware and loads the rest of the firmware">BUP</span></td><td>~350 KB</td><td class="err">Yes (AES)</td><td>Boot Up &mdash; early initialization</td></tr>
+    <tr><td class="key"><span class="tip" data-tip="Loader — dispatches and loads other modules into memory. Like a librarian that fetches the right books for you">LOD</span></td><td>~300 KB</td><td class="err">Yes (AES)</td><td>Loader &mdash; module dispatcher</td></tr>
+    <tr><td class="key"><span class="tip" data-tip="Platform Controller — manages the PCH (chipset). Handles communication between CPU and all peripherals like USB, SATA, PCIe">PMC</span></td><td>~200 KB</td><td class="err">Yes (AES)</td><td>Platform Controller &mdash; PCH management</td></tr>
+    <tr><td class="key"><span class="tip" data-tip="ARC EM processor code in plain text — not encrypted. These are the actual instructions that ME's Synopsys ARC CPU executes at runtime">ARC Code</span></td><td>~836 KB</td><td class="val">No</td><td>Unencrypted ARC EM runtime code (0x135000-0x1CA000)</td></tr>
+    <tr><td><span class="tip" data-tip="Root Key — the master cryptographic key used to decrypt and verify ME firmware. Stored in a small, protected area of the chip">rot.key</span></td><td>Small</td><td class="val">No</td><td>Root key for cryptographic operations</td></tr>
+    <tr><td><span class="tip" data-tip="Internal Configuration — settings that define how ME behaves on this specific hardware. Like a config file for ME">intl.cfg</span></td><td>Small</td><td class="val">No</td><td>Internal configuration parameters</td></tr>
+    <tr><td><span class="tip" data-tip="System Management Bus — a slow, simple communication wire used to read temperatures, fan speeds, and battery status from hardware sensors">smbus</span></td><td>Small</td><td class="val">No</td><td>SMBus controller interface</td></tr>
+    <tr><td><span class="tip" data-tip="Manifest — cryptographic metadata that proves this firmware is genuine Intel code. Contains digital signatures and hashes">FTPR.man</span></td><td>Small</td><td class="err">Yes</td><td>Manifest &mdash; module authentication metadata</td></tr>
   </table>
 </div>
 </div>
@@ -394,18 +468,18 @@ FW_R</div>
 
   <table>
     <tr><th>#</th><th>Finding</th><th>Significance</th></tr>
-    <tr><td>1</td><td>80 IFWI internal paths mapped</td><td>Complete CSME 16.x filesystem &mdash; first public map</td></tr>
-    <tr><td>2</td><td>29 CPD modules identified</td><td>Full module inventory from live hardware</td></tr>
+    <tr><td>1</td><td>80 <span class="tip" data-tip="Intel Firmware Image — the container format that holds all firmware partitions. 80 internal paths means we mapped every file and folder inside ME">IFWI</span> internal paths mapped</td><td>Complete CSME 16.x filesystem &mdash; first public map</td></tr>
+    <tr><td>2</td><td>29 <span class="tip" data-tip="Code Partition Directory — the master index listing every module inside ME firmware. Like a table of contents for the chip's software">CPD</span> modules identified</td><td>Full module inventory from live hardware</td></tr>
     <tr><td>3</td><td>8 JSON config blocks decoded</td><td>Intel's platform abstraction layer exposed</td></tr>
     <tr><td>4</td><td>13 X.509 certificates extracted</td><td>Complete On-Die CA trust hierarchy</td></tr>
-    <tr><td>5</td><td>CRL URL proves ME network stack</td><td>ME has independent HTTP client capability</td></tr>
-    <tr><td>6</td><td>RomBypass boot mechanism</td><td>Alternative boot path bypassing standard ROM init</td></tr>
-    <tr><td>7</td><td>Hypervisor Policy (HVMP) found</td><td>ME runs its own virtualization layer</td></tr>
+    <tr><td>5</td><td><span class="tip" data-tip="Certificate Revocation List — a URL that proves ME can connect to the internet to check if certificates are still valid">CRL</span> URL proves ME network stack</td><td>ME has independent HTTP client capability</td></tr>
+    <tr><td>6</td><td><span class="tip" data-tip="An alternative boot path that bypasses standard ROM initialization — a secret entrance in ME's boot sequence">RomBypass</span> boot mechanism</td><td>Alternative boot path bypassing standard ROM init</td></tr>
+    <tr><td>7</td><td><span class="tip" data-tip="Hypervisor Policy — ME runs its own virtualization layer, partitioning its execution into isolated domains like virtual machines">Hypervisor Policy (HVMP)</span> found</td><td>ME runs its own virtualization layer</td></tr>
     <tr><td>8</td><td>OverClocking engine at 0xCF45C</td><td>ME independently manages frequency scaling</td></tr>
-    <tr><td>9</td><td>FLOG + ELOG logging system</td><td>Internal audit trail persists across reboots</td></tr>
-    <tr><td>10</td><td>28/35 security structures mapped</td><td>Complete security architecture documentation</td></tr>
-    <tr><td>11</td><td>~836 KB unencrypted ARC code</td><td>Runtime code extractable without decryption</td></tr>
-    <tr><td>12</td><td>Custom cert decoder for Intel ME</td><td>Standard X.509 parsers fail on Intel's format</td></tr>
+    <tr><td>9</td><td><span class="tip" data-tip="Firmware Log + Error Log — ME's internal recording system. Keeps track of what it does and any errors that occur">FLOG + ELOG</span> logging system</td><td>Internal audit trail persists across reboots</td></tr>
+    <tr><td>10</td><td>28/35 <span class="tip" data-tip="Security structures — the internal building blocks of ME's security architecture. Each one controls a specific security feature">security structures</span> mapped</td><td>Complete security architecture documentation</td></tr>
+    <tr><td>11</td><td>~836 KB <span class="tip" data-tip="ARC EM — Synopsys's processor architecture. The unencrypted code is the actual instructions ME runs on its own CPU">unencrypted ARC code</span></td><td>Runtime code extractable without decryption</td></tr>
+    <tr><td>12</td><td>Custom <span class="tip" data-tip="X.509 — the standard for digital certificates. Intel ME uses a non-standard variant that breaks normal parsers">X.509</span> cert decoder for Intel ME</td><td>Standard X.509 parsers fail on Intel's format</td></tr>
   </table>
 </div>
 </div>
@@ -422,16 +496,16 @@ FW_R</div>
       <h3>Tools Used</h3>
       <ul>
         <li>Intel CSME System Tools v16.1 (MEInfoWin64, FPTW64, MEManufWin64)</li>
-        <li>Custom Python analysis scripts (CPD parser, ASN.1 decoder, entropy analyzer)</li>
+        <li>Custom Python analysis scripts (<span class="tip" data-tip="Code Partition Directory parser — finds and lists all modules inside ME firmware">CPD parser</span>, <span class="tip" data-tip="ASN.1 decoder — reads the binary format used for X.509 certificates. Had to build a custom one because Intel ME uses non-standard cert encoding">ASN.1 decoder</span>, entropy analyzer)</li>
         <li>Ghidra 11.3.2 (GUI mode for firmware disassembly)</li>
-        <li>Live hardware dump via HECI/MEI driver interface</li>
+        <li>Live hardware dump via <span class="tip" data-tip="Host Embedded Controller Interface / Management Engine Interface — the communication channel between CPU and ME. Used to dump ME firmware and run diagnostic tools">HECI/MEI</span> driver interface</li>
       </ul>
     </div>
     <div class="card">
       <h3>Limitations</h3>
       <ul>
-        <li>85% of firmware AES-encrypted &mdash; only decryptable by ME hardware at boot</li>
-        <li>No ARC disassembler available &mdash; runtime code analysis limited</li>
+        <li>85% of firmware <span class="tip" data-tip="Advanced Encryption Standard — military-grade encryption. The key is burned into the chip at manufacturing and can only be used by ME's own hardware">AES</span>-encrypted &mdash; only decryptable by ME hardware at boot</li>
+        <li>No <span class="tip" data-tip="ARC EM — Synopsys's processor architecture. Without a proper disassembler, we can't fully understand ME's runtime code">ARC disassembler</span> available &mdash; runtime code analysis limited</li>
         <li>Full 32 MB SPI flash dump not yet performed</li>
         <li>EC register map incomplete for IdeaPad Gaming 3</li>
       </ul>
@@ -444,6 +518,23 @@ FW_R</div>
 </div>
 
 <script>
+// ========================
+// EXPANDABLE DIAGRAMS
+// ========================
+function toggleDia(trigger) {
+  var panel = trigger.nextElementSibling;
+  var isOpen = panel.classList.contains('open');
+  // Close all other panels first
+  document.querySelectorAll('.dia-panel.open').forEach(function(p) {
+    p.classList.remove('open');
+    p.previousElementSibling.classList.remove('open');
+  });
+  if (!isOpen) {
+    panel.classList.add('open');
+    trigger.classList.add('open');
+  }
+}
+
 // ========================
 // NAVIGATION
 // ========================
