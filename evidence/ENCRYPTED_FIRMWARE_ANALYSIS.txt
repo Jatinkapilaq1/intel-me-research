@@ -1,0 +1,2686 @@
+================================================================================
+ENCRYPTED FIRMWARE DEEP ANALYSIS
+Learning secrets from encrypted code WITHOUT decryption
+================================================================================
+
+================================================================================
+SECTION 1: FIRMWARE STRUCTURE MAP
+================================================================================
+
+Even though the code is encrypted, the FIRMWARE STRUCTURE reveals
+what ME does. Different modules have different encryption patterns
+because they encrypt at different times with different IVs.
+
+Offset   Size     Entropy  0x00%   0xFF%   Type                 Region
+------------------------------------------------------------------------------------------
+0x000000    1024    0.493    5.2%   93.0%  EMPTY/ERASED          FDR
+0x000400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x000800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x000C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x001000    1024    1.064   12.6%   82.4%  CODE/DATA             FDR
+0x001400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x001800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x001C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x002800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x002C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x004000    1024    7.793    1.3%    0.5%  ENCRYPTED(v2)         FDR
+0x008000    1024    7.682    0.5%    0.4%  ENCRYPTED(v2)         FDR
+0x00C000    1024    7.755    0.5%    0.1%  ENCRYPTED(v2)         FDR
+0x010000    1024    7.772    0.6%    0.3%  ENCRYPTED(v2)         FDR
+0x014000    1024    7.763    1.8%    0.5%  ENCRYPTED(v2)         FDR
+0x018000    1024    7.690    0.2%    0.4%  ENCRYPTED(v2)         FDR
+0x019400    1024    3.833    6.2%   56.8%  CODE/DATA             FDR
+0x019800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x019C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x01FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FDR
+0x020000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x020400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x020800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x020C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x021000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x021400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x021800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x021C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x022800    1024    2.429    3.3%    0.8%  CODE/DATA             ROMB/PMCP
+0x024000    1024    6.546    5.5%    2.8%  COMPRESSED            ROMB/PMCP
+0x028000    1024    6.830    6.5%    2.0%  COMPRESSED            ROMB/PMCP
+0x02C000    1024    6.647   10.3%    1.3%  COMPRESSED            ROMB/PMCP
+0x030000    1024    6.572    7.2%    1.2%  COMPRESSED            ROMB/PMCP
+0x034000    1024    6.724    7.5%    1.9%  COMPRESSED            ROMB/PMCP
+0x038000    1024    6.658    9.5%    3.3%  COMPRESSED            ROMB/PMCP
+0x03AC00    1024    1.090   88.6%    0.6%  CODE/DATA             ROMB/PMCP
+0x03B000    1024    3.561   52.8%    9.5%  CODE/DATA             ROMB/PMCP
+0x03B800    1024    3.539   46.5%    2.7%  CODE/DATA             ROMB/PMCP
+0x03BC00    1024    3.981   53.1%    1.3%  CODE/DATA             ROMB/PMCP
+0x03C000    1024    6.079   21.1%    6.2%  COMPRESSED            ROMB/PMCP
+0x040000    1024    5.956   21.0%    0.0%  MIXED                 ROMB/PMCP
+0x044000    1024    5.542   28.8%    0.1%  MIXED                 ROMB/PMCP
+0x047000    1024    3.587   53.6%    2.2%  CODE/DATA             ROMB/PMCP
+0x047C00    1024    2.109   69.4%    5.1%  CODE/DATA             ROMB/PMCP
+0x048000    1024    2.084   70.3%    0.0%  CODE/DATA             ROMB/PMCP
+0x048400    1024    2.308   59.4%    0.0%  CODE/DATA             ROMB/PMCP
+0x048800    1024    2.791   51.4%    7.2%  CODE/DATA             ROMB/PMCP
+0x048C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x049000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x049400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x049800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x049C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x04FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x050000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x050400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x050800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x050C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x051000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x051400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x051800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x051C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x052000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x052400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x052800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x052C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x053000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x053400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x053800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x053C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x054000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x054400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x054800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x054C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x055000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x055400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x055800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x055C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x056000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x056400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x056800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x056C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x057000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x057400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x057800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x057C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x058000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x058400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x058800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x058C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x059000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x059400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x059800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x059C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x05FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x060000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x060400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x060800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x060C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x061000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x061400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x061800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x061C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ROMB/PMCP
+0x062800    1024    1.287    3.5%   86.7%  CODE/DATA             FTPR_ENC
+0x062C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x063800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x063C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x064000    1024    7.028    2.9%    0.4%  ENCRYPTED(v1)         FTPR_ENC
+0x068000    1024    7.668    5.7%    0.6%  ENCRYPTED(v2)         FTPR_ENC
+0x06C000    1024    7.733    0.4%    0.1%  ENCRYPTED(v2)         FTPR_ENC
+0x070000    1024    7.798    0.6%    0.3%  ENCRYPTED(v2)         FTPR_ENC
+0x074000    1024    7.792    0.5%    0.7%  ENCRYPTED(v2)         FTPR_ENC
+0x076800    1024    2.732    2.5%   71.1%  CODE/DATA             FTPR_ENC
+0x076C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x078000    1024    7.771    0.4%    0.6%  ENCRYPTED(v2)         FTPR_ENC
+0x07C000    1024    7.777    2.1%    0.4%  ENCRYPTED(v2)         FTPR_ENC
+0x080000    1024    7.782    1.0%    0.5%  ENCRYPTED(v2)         FTPR_ENC
+0x084000    1024    7.626    5.3%    0.0%  ENCRYPTED(v2)         FTPR_ENC
+0x088000    1024    7.664    0.4%    1.2%  ENCRYPTED(v2)         FTPR_ENC
+0x08C000    1024    7.674    0.7%    0.2%  ENCRYPTED(v2)         FTPR_ENC
+0x090000    1024    7.631    0.4%    0.5%  ENCRYPTED(v2)         FTPR_ENC
+0x092800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x092C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x094000    1024    7.704    0.4%    0.4%  ENCRYPTED(v2)         FTPR_ENC
+0x098000    1024    7.775    0.9%    0.7%  ENCRYPTED(v2)         FTPR_ENC
+0x09C000    1024    7.786    0.9%    0.3%  ENCRYPTED(v2)         FTPR_ENC
+0x0A0000    1024    7.747    0.6%    0.2%  ENCRYPTED(v2)         FTPR_ENC
+0x0A4000    1024    7.659    4.7%    0.2%  ENCRYPTED(v2)         FTPR_ENC
+0x0A8000    1024    7.787    0.5%    0.2%  ENCRYPTED(v2)         FTPR_ENC
+0x0AC000    1024    7.740    0.5%    0.3%  ENCRYPTED(v2)         FTPR_ENC
+0x0B0000    1024    7.739    2.9%    0.4%  ENCRYPTED(v2)         FTPR_ENC
+0x0B4000    1024    7.737    0.3%    0.6%  ENCRYPTED(v2)         FTPR_ENC
+0x0B8000    1024    7.699    1.9%    0.3%  ENCRYPTED(v2)         FTPR_ENC
+0x0BC000    1024    7.772    2.0%    0.5%  ENCRYPTED(v2)         FTPR_ENC
+0x0C0000    1024    7.724    0.6%    0.0%  ENCRYPTED(v2)         FTPR_ENC
+0x0C4000    1024    7.737    0.3%    0.5%  ENCRYPTED(v2)         FTPR_ENC
+0x0C8000    1024    7.585    4.6%    1.1%  ENCRYPTED(v2)         FTPR_ENC
+0x0CBC00    1024    1.534    3.9%   82.0%  CODE/DATA             FTPR_ENC
+0x0CC000    1024    3.751   48.1%    0.6%  CODE/DATA             FTPR_ENC
+0x0CD800    1024    1.177   86.6%    0.0%  CODE/DATA             FTPR_ENC
+0x0CDC00    1024    0.000  100.0%    0.0%  EMPTY/ERASED          FTPR_ENC
+0x0CE000    1024    0.045   99.6%    0.0%  EMPTY/ERASED          FTPR_ENC
+0x0CE400    1024    0.000  100.0%    0.0%  EMPTY/ERASED          FTPR_ENC
+0x0CE800    1024    0.000  100.0%    0.0%  EMPTY/ERASED          FTPR_ENC
+0x0CEC00    1024    0.000  100.0%    0.0%  EMPTY/ERASED          FTPR_ENC
+0x0CF000    1024    1.080   81.9%    0.0%  CODE/DATA             FTPR_ENC
+0x0CF400    1024    2.550   66.5%    4.3%  CODE/DATA             FTPR_ENC
+0x0CF800    1024    1.074   86.7%    1.3%  CODE/DATA             FTPR_ENC
+0x0CFC00    1024    0.790   91.0%    0.0%  EMPTY/ERASED          FTPR_ENC
+0x0D0000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          FTPR_ENC
+0x0D0400    1024    0.000  100.0%    0.0%  EMPTY/ERASED          FTPR_ENC
+0x0D0800    1024    0.954   37.4%   62.6%  EMPTY/ERASED          FTPR_ENC
+0x0D0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0D3C00    1024    2.396    2.8%   73.6%  CODE/DATA             FTPR_ENC
+0x0D4000    1024    7.636    3.5%    0.4%  ENCRYPTED(v2)         FTPR_ENC
+0x0D8000    1024    7.792    0.8%    0.0%  ENCRYPTED(v2)         FTPR_ENC
+0x0DC000    1024    7.722    2.6%    0.3%  ENCRYPTED(v2)         FTPR_ENC
+0x0E0000    1024    7.704    1.0%    0.8%  ENCRYPTED(v2)         FTPR_ENC
+0x0E4000    1024    3.970    1.1%   53.6%  CODE/DATA             FTPR_ENC
+0x0E4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0E4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0E4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0E7800    1024    1.991    2.8%   73.5%  CODE/DATA             FTPR_ENC
+0x0E7C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0E8000    1024    7.761    1.1%    0.4%  ENCRYPTED(v2)         FTPR_ENC
+0x0EC000    1024    7.705    0.3%    0.5%  ENCRYPTED(v2)         FTPR_ENC
+0x0EE400    1024    0.671    2.5%   93.0%  EMPTY/ERASED          FTPR_ENC
+0x0EE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0EEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0EFC00    1024    1.665    1.8%   74.2%  CODE/DATA             FTPR_ENC
+0x0F0000    1024    7.783    1.6%    0.3%  ENCRYPTED(v2)         FTPR_ENC
+0x0F2000    1024    1.267    0.2%   88.4%  CODE/DATA             FTPR_ENC
+0x0F2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0F2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0F2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x0F4000    1024    7.798    0.7%    0.2%  ENCRYPTED(v2)         FTPR_ENC
+0x0F8000    1024    7.720    1.5%    0.1%  ENCRYPTED(v2)         FTPR_ENC
+0x0FC000    1024    7.746    0.6%    0.1%  ENCRYPTED(v2)         FTPR_ENC
+0x100000    1024    7.739    0.5%    0.1%  ENCRYPTED(v2)         FTPR_ENC
+0x104000    1024    7.771    0.9%    0.0%  ENCRYPTED(v2)         FTPR_ENC
+0x108000    1024    7.716    0.1%    0.2%  ENCRYPTED(v2)         FTPR_ENC
+0x10C000    1024    7.676    1.3%    0.2%  ENCRYPTED(v2)         FTPR_ENC
+0x110000    1024    7.654    2.9%    0.4%  ENCRYPTED(v2)         FTPR_ENC
+0x114000    1024    7.263    2.4%    0.0%  ENCRYPTED(v1)         FTPR_ENC
+0x118000    1024    7.703    0.6%    1.0%  ENCRYPTED(v2)         FTPR_ENC
+0x11C000    1024    7.757    0.6%    0.2%  ENCRYPTED(v2)         FTPR_ENC
+0x11E800    1024    1.897    4.6%   79.6%  CODE/DATA             FTPR_ENC
+0x11EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          FTPR_ENC
+0x120000    1024    7.788    0.4%    0.6%  ENCRYPTED(v2)         FTPR_ENC
+0x124000    1024    7.604    5.9%    0.6%  ENCRYPTED(v2)         FTPR_ENC
+0x128000    1024    7.749    1.0%    0.3%  ENCRYPTED(v2)         FTPR_ENC
+0x12C000    1024    7.721    0.4%    0.4%  ENCRYPTED(v2)         FTPR_ENC
+0x130000    1024    7.452    2.6%    6.2%  ENCRYPTED(v1)         FTPR_ENC
+0x134000    1024    7.765    0.6%    0.6%  ENCRYPTED(v2)         FTPR_ENC
+0x138000    1024    7.771    0.6%    0.1%  ENCRYPTED(v2)         ARC_BOOT
+0x13C000    1024    7.756    0.4%    0.1%  ENCRYPTED(v2)         ARC_BOOT
+0x140000    1024    7.765    0.2%    0.7%  ENCRYPTED(v2)         ARC_BOOT
+0x144000    1024    7.743    0.7%    0.4%  ENCRYPTED(v2)         ARC_BOOT
+0x148000    1024    7.647    3.7%    0.4%  ENCRYPTED(v2)         ARC_BOOT
+0x14C000    1024    7.629    2.5%    0.2%  ENCRYPTED(v2)         ARC_BOOT
+0x150000    1024    7.739    2.0%    0.0%  ENCRYPTED(v2)         ARC_BOOT
+0x154000    1024    7.769    0.5%    0.3%  ENCRYPTED(v2)         ARC_BOOT
+0x158000    1024    7.767    0.6%    0.1%  ENCRYPTED(v2)         ARC_BOOT
+0x15C000    1024    7.786    0.5%    0.6%  ENCRYPTED(v2)         ARC_BOOT
+0x160000    1024    7.698    0.2%    0.3%  ENCRYPTED(v2)         ARC_BOOT
+0x164000    1024    7.742    1.1%    0.1%  ENCRYPTED(v2)         ARC_BOOT
+0x168000    1024    7.748    0.6%    0.0%  ENCRYPTED(v2)         ARC_BOOT
+0x16B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x16FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x170000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x170400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x170800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x170C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x171000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x171400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x171800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x171C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x172000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x172400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x172800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x172C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x173000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x173400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x173800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x173C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x174000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x174400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x174800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x174C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x175000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x175400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x175800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x175C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x176000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x176400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x176800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x176C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x177000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x177400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x177800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x177C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x178000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x178400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x178800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x178C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x179000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x179400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x179800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x179C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x17FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x180000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x180400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x180800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x180C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x181000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x181400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x181800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x181C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x182000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x182400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x182800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x182C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x183000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x183400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x183800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x183C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x184000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x184400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x184800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x184C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x185000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x185400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x185800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x185C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x186000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x186400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x186800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x186C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x187000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x187400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x187800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x187C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x188000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x188400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x188800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x188C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x189000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x189400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x189800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x189C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x18FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x190000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x190400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x190800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x190C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x191000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x191400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x191800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x191C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x192000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x192400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x192800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x192C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x193000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x193400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x193800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x193C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x194000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x194400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x194800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x194C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x195000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x195400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x195800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x195C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x196000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x196400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x196800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x196C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x197400    1024    2.093   12.3%   72.9%  CODE/DATA             ARC_BOOT
+0x197800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x197C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x198000    1024    7.043   17.5%    0.0%  ENCRYPTED(v1)         ARC_BOOT
+0x198800    1024    3.992   50.6%    0.2%  CODE/DATA             ARC_BOOT
+0x198C00    1024    3.974   53.5%    0.2%  CODE/DATA             ARC_BOOT
+0x19C000    1024    6.776    5.5%    0.6%  COMPRESSED            ARC_BOOT
+0x1A0000    1024    6.666    8.6%    1.2%  COMPRESSED            ARC_BOOT
+0x1A4000    1024    6.675    6.9%    1.7%  COMPRESSED            ARC_BOOT
+0x1A4800    1024    3.843   54.7%    0.9%  CODE/DATA             ARC_BOOT
+0x1A5000    1024    3.945   54.7%    0.3%  CODE/DATA             ARC_BOOT
+0x1A5800    1024    3.894   54.2%    0.9%  CODE/DATA             ARC_BOOT
+0x1A5C00    1024    3.971   53.9%    0.7%  CODE/DATA             ARC_BOOT
+0x1A6000    1024    3.995   54.1%    0.1%  CODE/DATA             ARC_BOOT
+0x1A6400    1024    3.779   55.3%    0.0%  CODE/DATA             ARC_BOOT
+0x1A6800    1024    3.884   54.7%    0.1%  CODE/DATA             ARC_BOOT
+0x1A7400    1024    3.795   58.2%    1.3%  CODE/DATA             ARC_BOOT
+0x1A7800    1024    3.968   54.4%    0.9%  CODE/DATA             ARC_BOOT
+0x1A7C00    1024    3.060   65.0%    0.1%  CODE/DATA             ARC_BOOT
+0x1A8000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1A8400    1024    2.575   68.8%    0.0%  CODE/DATA             ARC_BOOT
+0x1A8800    1024    3.326   55.0%    1.1%  CODE/DATA             ARC_BOOT
+0x1A8C00    1024    1.346   85.1%    0.3%  CODE/DATA             ARC_BOOT
+0x1A9000    1024    1.674   70.4%    1.6%  CODE/DATA             ARC_BOOT
+0x1A9400    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1A9800    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1A9C00    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1AA000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1AA400    1024    2.575   68.8%    0.0%  CODE/DATA             ARC_BOOT
+0x1AA800    1024    3.326   55.0%    1.1%  CODE/DATA             ARC_BOOT
+0x1AAC00    1024    1.346   85.1%    0.3%  CODE/DATA             ARC_BOOT
+0x1AB000    1024    1.674   70.4%    1.6%  CODE/DATA             ARC_BOOT
+0x1AB400    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1AB800    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1ABC00    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1AC000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1AC400    1024    0.823   90.4%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1AC800    1024    1.639   76.2%    8.6%  CODE/DATA             ARC_BOOT
+0x1ACC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1AD000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1AD400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1AD800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1ADC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1AE000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1AE400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1AE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1AEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1B0000    1024    6.776    5.7%    2.4%  COMPRESSED            ARC_BOOT
+0x1B3C00    1024    0.562   94.6%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1B4000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1B4400    1024    1.059   89.4%    0.6%  CODE/DATA             ARC_BOOT
+0x1B8000    1024    6.315    5.4%    0.6%  COMPRESSED            ARC_BOOT
+0x1B9400    1024    2.586   71.8%    0.9%  CODE/DATA             ARC_BOOT
+0x1B9C00    1024    2.043   61.9%    2.7%  CODE/DATA             ARC_BOOT
+0x1BA000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1BA400    1024    1.054   88.7%    0.0%  CODE/DATA             ARC_BOOT
+0x1BB000    1024    2.524   69.8%    6.1%  CODE/DATA             ARC_BOOT
+0x1BC000    1024    6.431    6.3%    0.2%  COMPRESSED            ARC_BOOT
+0x1C0000    1024    2.845   66.4%    0.0%  CODE/DATA             ARC_BOOT
+0x1C0400    1024    3.550   49.6%   14.9%  CODE/DATA             ARC_BOOT
+0x1C0800    1024    1.530   82.9%    4.7%  CODE/DATA             ARC_BOOT
+0x1C0C00    1024    0.000  100.0%    0.0%  EMPTY/ERASED          ARC_BOOT
+0x1C1000    1024    3.255   59.1%    8.6%  CODE/DATA             ARC_BOOT
+0x1C1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          ARC_BOOT
+0x1C5800    1024    3.148   27.3%   44.9%  CODE/DATA             ARC_BOOT
+0x1C5C00    1024    3.018   20.5%   50.8%  CODE/DATA             ARC_BOOT
+0x1C6000    1024    1.035    6.2%   85.9%  CODE/DATA             ARC_BOOT
+0x1C6400    1024    0.233    0.9%   97.7%  EMPTY/ERASED          ARC_BOOT
+0x1C6C00    1024    3.738   55.4%    0.3%  CODE/DATA             ARC_BOOT
+0x1C8000    1024    5.599    2.5%    0.0%  MIXED                 ARC_BOOT
+0x1CC000    1024    6.118    3.2%    1.5%  COMPRESSED            MID
+0x1CE800    1024    3.218   62.9%    0.0%  CODE/DATA             MID
+0x1CEC00    1024    1.522   84.1%    1.5%  CODE/DATA             MID
+0x1CF000    1024    1.432   85.6%    0.5%  CODE/DATA             MID
+0x1D0000    1024    6.849    6.2%    2.5%  COMPRESSED            MID
+0x1D4000    1024    6.740    5.6%    0.9%  COMPRESSED            MID
+0x1D8000    1024    6.346    9.4%    1.0%  COMPRESSED            MID
+0x1D8800    1024    2.623   70.9%    0.4%  CODE/DATA             MID
+0x1D8C00    1024    0.000  100.0%    0.0%  EMPTY/ERASED          MID
+0x1D9000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          MID
+0x1DC000    1024    6.237   10.6%    0.2%  COMPRESSED            MID
+0x1DD800    1024    2.729    7.1%   48.9%  CODE/DATA             MID
+0x1E0000    1024    6.254    6.7%    0.1%  COMPRESSED            MID
+0x1E4000    1024    6.495   10.2%    0.7%  COMPRESSED            MID
+0x1E8000    1024    6.531    6.7%    0.9%  COMPRESSED            MID
+0x1EC000    1024    6.507    5.4%    0.3%  COMPRESSED            MID
+0x1F0000    1024    6.573    6.8%    0.5%  COMPRESSED            MID
+0x1F4000    1024    6.274    5.2%    0.0%  COMPRESSED            MID
+0x1F8000    1024    6.521    8.1%    0.2%  COMPRESSED            MID
+0x1FC000    1024    6.091    5.2%    0.0%  COMPRESSED            MID
+0x200000    1024    3.571    2.0%    0.7%  CODE/DATA             MID
+0x204000    1024    6.476    6.2%    0.3%  COMPRESSED            MID
+0x204C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x205000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x205400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x205800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x205C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x206000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x206400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x206800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x206C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x207000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x207400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x207800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x207C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x208000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x208400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x208800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x208C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x209000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x209400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x209800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x209C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x20FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          MID
+0x210000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x210400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x210800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x210C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x211800    1024    3.244   51.2%    0.8%  CODE/DATA             CERTS
+0x211C00    1024    3.520   45.8%    0.2%  CODE/DATA             CERTS
+0x212000    1024    3.733   42.7%    0.3%  CODE/DATA             CERTS
+0x212400    1024    3.779   43.2%    0.7%  CODE/DATA             CERTS
+0x212C00    1024    0.521    0.2%   95.0%  EMPTY/ERASED          CERTS
+0x213000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x213400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x213800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x213C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x214000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x214400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x214800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x214C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x215000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x215400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x215800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x215C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x216000    1024    1.108   88.4%    0.5%  CODE/DATA             CERTS
+0x216400    1024    0.344    2.5%   95.8%  EMPTY/ERASED          CERTS
+0x216800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x216C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x218000    1024    7.816    0.1%    0.4%  ENCRYPTED(v2)         CERTS
+0x218C00    1024    3.005   70.5%    0.1%  CODE/DATA             CERTS
+0x219000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x219400    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x219800    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x219C00    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x21A000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x21A400    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x21A800    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x21AC00    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x21B400    1024    2.413   40.7%   43.3%  CODE/DATA             CERTS
+0x21B800    1024    3.971   59.6%    0.2%  CODE/DATA             CERTS
+0x21C000    1024    7.193   14.7%    0.3%  ENCRYPTED(v1)         CERTS
+0x220000    1024    7.779    2.2%    0.3%  ENCRYPTED(v2)         CERTS
+0x221000    1024    0.182    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x221400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x221800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x221C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x222000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x222400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x222800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x222C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x224000    1024    7.398   10.6%    0.3%  ENCRYPTED(v1)         CERTS
+0x228000    1024    6.395   28.4%    0.2%  COMPRESSED            CERTS
+0x229400    1024    3.872   50.5%    0.1%  CODE/DATA             CERTS
+0x229C00    1024    3.067   62.1%    0.0%  CODE/DATA             CERTS
+0x22AC00    1024    3.884   52.0%    1.3%  CODE/DATA             CERTS
+0x22C000    1024    7.556    8.4%    0.5%  ENCRYPTED(v2)         CERTS
+0x22F000    1024    0.182    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x22F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x22F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x22FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x230000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x230400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x230800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x230C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x231400    1024    3.561   52.1%    0.0%  CODE/DATA             CERTS
+0x231800    1024    2.857   65.5%    0.0%  CODE/DATA             CERTS
+0x231C00    1024    1.814   14.6%   71.7%  CODE/DATA             CERTS
+0x232000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x232400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x232800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x232C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x234000    1024    7.543    8.7%    0.5%  ENCRYPTED(v2)         CERTS
+0x237000    1024    3.144   66.1%    2.6%  CODE/DATA             CERTS
+0x237400    1024    2.876   66.3%    4.7%  CODE/DATA             CERTS
+0x237800    1024    3.163   65.9%    0.7%  CODE/DATA             CERTS
+0x237C00    1024    2.149   77.3%    0.1%  CODE/DATA             CERTS
+0x238000    1024    5.583   38.8%    0.2%  MIXED                 CERTS
+0x23C000    1024    7.582    7.6%    0.2%  ENCRYPTED(v2)         CERTS
+0x23F800    1024    3.097   62.7%    0.1%  CODE/DATA             CERTS
+0x23FC00    1024    3.186   60.4%    0.1%  CODE/DATA             CERTS
+0x240000    1024    2.587   67.6%    0.5%  CODE/DATA             CERTS
+0x240400    1024    2.948   62.7%    0.0%  CODE/DATA             CERTS
+0x240C00    1024    2.838   65.9%    1.3%  CODE/DATA             CERTS
+0x242C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x243000    1024    0.182    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x243400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x243800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x243C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x244000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x244400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x244800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x244C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x248000    1024    7.577    7.9%    0.0%  ENCRYPTED(v2)         CERTS
+0x24AC00    1024    0.721    6.4%   90.2%  EMPTY/ERASED          CERTS
+0x24B000    1024    3.164   64.0%    3.5%  CODE/DATA             CERTS
+0x24C000    1024    7.418   10.9%    0.3%  ENCRYPTED(v1)         CERTS
+0x24C800    1024    0.355   96.9%    0.0%  EMPTY/ERASED          CERTS
+0x24CC00    1024    0.355   96.9%    0.0%  EMPTY/ERASED          CERTS
+0x24D400    1024    3.341   61.4%    0.8%  CODE/DATA             CERTS
+0x24F000    1024    0.182    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x24F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x24F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x24FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x250000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x250400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x250800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x250C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x254000    1024    7.661    6.0%    0.3%  ENCRYPTED(v2)         CERTS
+0x255800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x255C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x256000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x256400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x256800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x256C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x258000    1024    7.294   13.6%    0.5%  ENCRYPTED(v1)         CERTS
+0x25B000    1024    0.182    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x25B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25F000    1024    0.180    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x25F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x25FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x260000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x260400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x260800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x260C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x261000    1024    0.182    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x261400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x261800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x261C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x262000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x262400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x262800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x262C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x264000    1024    6.654   24.1%    0.3%  COMPRESSED            CERTS
+0x265000    1024    0.182    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x265400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x265800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x265C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x266000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x266400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x266800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x266C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x268000    1024    7.017   18.3%    0.6%  ENCRYPTED(v1)         CERTS
+0x26B400    1024    3.683   53.1%    0.0%  CODE/DATA             CERTS
+0x26B800    1024    3.057   63.7%    0.1%  CODE/DATA             CERTS
+0x26BC00    1024    3.146   58.1%    0.0%  CODE/DATA             CERTS
+0x26C000    1024    3.499   52.6%    0.0%  CODE/DATA             CERTS
+0x26C400    1024    3.379   57.8%    0.0%  CODE/DATA             CERTS
+0x270000    1024    7.012   19.1%    0.4%  ENCRYPTED(v1)         CERTS
+0x271000    1024    0.180    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x271400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x271800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x271C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x272000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x272400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x272800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x272C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x273400    1024    3.563   59.2%    0.7%  CODE/DATA             CERTS
+0x273800    1024    3.062   69.2%    0.2%  CODE/DATA             CERTS
+0x274000    1024    7.116   16.5%    0.5%  ENCRYPTED(v1)         CERTS
+0x278000    1024    7.238   14.6%    0.6%  ENCRYPTED(v1)         CERTS
+0x279000    1024    0.180    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x279400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x279800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x279C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27B000    1024    1.093   90.1%    0.0%  CODE/DATA             CERTS
+0x27C000    1024    6.875   20.9%    0.2%  COMPRESSED            CERTS
+0x27D000    1024    0.182    0.7%   98.2%  EMPTY/ERASED          CERTS
+0x27D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x27FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x280000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x280400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x280800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x280C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x281000    1024    3.856   48.6%    0.6%  CODE/DATA             CERTS
+0x281400    1024    0.262    0.7%   97.5%  EMPTY/ERASED          CERTS
+0x281800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x281C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x282000    1024    2.336   12.9%   64.7%  CODE/DATA             CERTS
+0x282400    1024    3.377   37.2%    0.2%  CODE/DATA             CERTS
+0x282800    1024    3.376   30.6%   18.9%  CODE/DATA             CERTS
+0x282C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x283000    1024    0.151    0.9%   98.4%  EMPTY/ERASED          CERTS
+0x283400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x283800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x283C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x284000    1024    4.246   34.6%    0.3%  MIXED                 CERTS
+0x284400    1024    1.085    4.6%   86.8%  CODE/DATA             CERTS
+0x284800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x284C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x285000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x285400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x285800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x285C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x286000    1024    0.164    1.1%   98.2%  EMPTY/ERASED          CERTS
+0x286400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x286800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x286C00    1024    0.045    0.1%   99.6%  EMPTY/ERASED          CERTS
+0x287000    1024    0.141    1.1%   98.4%  EMPTY/ERASED          CERTS
+0x287400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x287800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x287C00    1024    0.045    0.0%   99.6%  EMPTY/ERASED          CERTS
+0x288000    1024    0.141    1.1%   98.4%  EMPTY/ERASED          CERTS
+0x288400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x288800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x288C00    1024    0.045    0.0%   99.6%  EMPTY/ERASED          CERTS
+0x289400    1024    2.009   18.0%   64.3%  CODE/DATA             CERTS
+0x28A400    1024    2.009   18.0%   64.3%  CODE/DATA             CERTS
+0x28B400    1024    2.006   18.0%   64.3%  CODE/DATA             CERTS
+0x28C000    1024    0.141    1.1%   98.4%  EMPTY/ERASED          CERTS
+0x28C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x28C800    1024    0.022    0.0%   99.8%  EMPTY/ERASED          CERTS
+0x28CC00    1024    0.045    0.0%   99.6%  EMPTY/ERASED          CERTS
+0x28D000    1024    0.141    1.1%   98.4%  EMPTY/ERASED          CERTS
+0x28D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x28D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x28DC00    1024    0.045    0.0%   99.6%  EMPTY/ERASED          CERTS
+0x28E000    1024    0.141    1.1%   98.4%  EMPTY/ERASED          CERTS
+0x28E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x28E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x28EC00    1024    0.045    0.0%   99.6%  EMPTY/ERASED          CERTS
+0x28F000    1024    0.141    1.1%   98.4%  EMPTY/ERASED          CERTS
+0x28F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x28F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x28FC00    1024    0.045    0.0%   99.6%  EMPTY/ERASED          CERTS
+0x290000    1024    6.470   13.4%   13.3%  COMPRESSED            CERTS
+0x290400    1024    1.994   17.9%   64.5%  CODE/DATA             CERTS
+0x291400    1024    2.005   18.1%   64.3%  CODE/DATA             CERTS
+0x293400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x293800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x293C00    1024    0.045    0.0%   99.6%  EMPTY/ERASED          CERTS
+0x294000    1024    4.011   43.3%    0.5%  MIXED                 CERTS
+0x295800    1024    2.748   59.7%    0.0%  CODE/DATA             CERTS
+0x295C00    1024    2.132   70.4%    5.6%  CODE/DATA             CERTS
+0x296000    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x296400    1024    0.000  100.0%    0.0%  EMPTY/ERASED          CERTS
+0x296800    1024    0.433   91.1%    8.9%  EMPTY/ERASED          CERTS
+0x296C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x297000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x297400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x297800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x297C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x298000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x298400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x298800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x298C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x299000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x299400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x299800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x299C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29C000    1024    5.356   14.3%    0.0%  MIXED                 CERTS
+0x29D400    1024    3.967    9.5%    0.0%  CODE/DATA             CERTS
+0x29D800    1024    0.000    0.0%    0.0%  EMPTY/ERASED          CERTS
+0x29DC00    1024    0.000    0.0%    0.0%  EMPTY/ERASED          CERTS
+0x29E000    1024    0.000    0.0%    0.0%  EMPTY/ERASED          CERTS
+0x29E400    1024    0.000    0.0%    0.0%  EMPTY/ERASED          CERTS
+0x29E800    1024    0.000    0.0%    0.0%  EMPTY/ERASED          CERTS
+0x29EC00    1024    0.000    0.0%    0.0%  EMPTY/ERASED          CERTS
+0x29F000    1024    2.436   57.6%   24.5%  CODE/DATA             CERTS
+0x29F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x29FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          CERTS
+0x2A0000    1024    2.377   58.3%   24.5%  CODE/DATA             NFTP_ENC
+0x2A0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          NFTP_ENC
+0x2A0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          NFTP_ENC
+0x2A0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          NFTP_ENC
+0x2A1000    1024    0.828   12.7%   84.8%  EMPTY/ERASED          NFTP_ENC
+0x2A1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          NFTP_ENC
+0x2A1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          NFTP_ENC
+0x2A1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          NFTP_ENC
+0x2A4000    1024    7.775    0.5%    0.8%  ENCRYPTED(v2)         NFTP_ENC
+0x2A8000    1024    7.716    2.4%    0.8%  ENCRYPTED(v2)         NFTP_ENC
+0x2AC000    1024    7.801    0.8%    0.5%  ENCRYPTED(v2)         NFTP_ENC
+0x2B0000    1024    7.720    1.9%    0.1%  ENCRYPTED(v2)         NFTP_ENC
+0x2B4000    1024    7.774    0.5%    0.0%  ENCRYPTED(v2)         NFTP_ENC
+0x2B8000    1024    7.612    5.5%    0.1%  ENCRYPTED(v2)         NFTP_ENC
+0x2BC000    1024    7.682    4.5%    0.2%  ENCRYPTED(v2)         NFTP_ENC
+0x2C0000    1024    7.759    0.7%    0.4%  ENCRYPTED(v2)         NFTP_ENC
+0x2C4000    1024    7.584    0.8%    0.5%  ENCRYPTED(v2)         NFTP_ENC
+0x2C8000    1024    7.434    0.1%    0.5%  ENCRYPTED(v1)         NFTP_ENC
+0x2CC000    1024    7.662    0.7%    1.0%  ENCRYPTED(v2)         NFTP_ENC
+0x2D0000    1024    7.594    0.5%    1.4%  ENCRYPTED(v2)         NFTP_ENC
+0x2D4000    1024    7.627    0.9%    1.4%  ENCRYPTED(v2)         NFTP_ENC
+0x2D8000    1024    7.562    0.6%    0.2%  ENCRYPTED(v2)         NFTP_ENC
+0x2DC000    1024    7.433    6.1%    0.8%  ENCRYPTED(v1)         NFTP_ENC
+0x2E0000    1024    7.609    0.5%    0.4%  ENCRYPTED(v2)         NFTP_ENC
+0x2E4000    1024    7.612    0.3%    0.1%  ENCRYPTED(v2)         NFTP_ENC
+0x2E8000    1024    7.313    1.1%    0.0%  ENCRYPTED(v1)         NFTP_ENC
+0x2EC000    1024    7.791    0.2%    0.3%  ENCRYPTED(v2)         NFTP_ENC
+0x2F0000    1024    7.531    2.4%    5.3%  ENCRYPTED(v2)         NFTP_ENC
+0x2F4000    1024    7.773    0.9%    0.5%  ENCRYPTED(v2)         NFTP_ENC
+0x2F8000    1024    7.623    5.2%    0.7%  ENCRYPTED(v2)         NFTP_ENC
+0x2FC000    1024    7.802    0.4%    0.2%  ENCRYPTED(v2)         NFTP_ENC
+0x300000    1024    7.815    0.4%    0.0%  ENCRYPTED(v2)         NFTP_ENC
+0x304000    1024    7.820    0.8%    0.3%  ENCRYPTED(v2)         NFTP_ENC
+0x308000    1024    7.818    0.3%    0.4%  ENCRYPTED(v2)         NFTP_ENC
+0x30C000    1024    7.829    0.2%    0.8%  ENCRYPTED(v2)         NFTP_ENC
+0x310000    1024    7.818    0.7%    0.0%  ENCRYPTED(v2)         NFTP_ENC
+0x314000    1024    7.787    0.3%    0.2%  ENCRYPTED(v2)         NFTP_ENC
+0x318000    1024    7.814    0.4%    0.5%  ENCRYPTED(v2)         NFTP_ENC
+0x31C000    1024    7.807    0.4%    0.6%  ENCRYPTED(v2)         NFTP_ENC
+0x320000    1024    7.636    2.3%    0.5%  ENCRYPTED(v2)         NFTP_ENC
+0x324000    1024    7.602    6.1%    0.4%  ENCRYPTED(v2)         NFTP_ENC
+0x328000    1024    7.755    0.2%    0.2%  ENCRYPTED(v2)         NFTP_ENC
+0x32C000    1024    7.788    0.5%    0.5%  ENCRYPTED(v2)         NFTP_ENC
+0x330000    1024    7.725    0.3%    1.1%  ENCRYPTED(v2)         NFTP_ENC
+0x334000    1024    7.721    0.4%    1.0%  ENCRYPTED(v2)         NFTP_ENC
+0x338000    1024    7.803    0.5%    0.7%  ENCRYPTED(v2)         NFTP_ENC
+0x33C000    1024    7.790    0.8%    0.2%  ENCRYPTED(v2)         NFTP_ENC
+0x340000    1024    7.755    0.2%    0.3%  ENCRYPTED(v2)         NFTP_ENC
+0x344000    1024    7.649    4.2%    0.3%  ENCRYPTED(v2)         NFTP_ENC
+0x348000    1024    7.776    1.1%    0.6%  ENCRYPTED(v2)         NFTP_ENC
+0x34C000    1024    7.657    3.7%    0.5%  ENCRYPTED(v2)         NFTP_ENC
+0x350000    1024    7.759    0.4%    0.6%  ENCRYPTED(v2)         DATA
+0x354000    1024    7.708    0.4%    0.3%  ENCRYPTED(v2)         DATA
+0x358000    1024    7.703    0.2%    0.2%  ENCRYPTED(v2)         DATA
+0x35C000    1024    7.517    3.4%    5.7%  ENCRYPTED(v2)         DATA
+0x35D800    1024    2.992    3.4%   68.8%  CODE/DATA             DATA
+0x35DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x35E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x35E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x35E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x35EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x35F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x35F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x35F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x35FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x360000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x360400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x360800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x360C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x361000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x361400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x361800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x361C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x362000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x362400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x362800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x362C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x363000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x363400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x363800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x363C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x364000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x364400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x364800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x364C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x365000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x365400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x365800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x365C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x366000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x366400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x366800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x366C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x367000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x367400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x367800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x367C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x368000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x368400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x368800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x368C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x369000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x369400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x369800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x369C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x36FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x370000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x370400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x370800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x370C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x371000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x371400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x371800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x371C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x372000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x372400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x372800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x372C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x373000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x373400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x373800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x373C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x374000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x374400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x374800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x374C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x375000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x375400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x375800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x375C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x376000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x376400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x376800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x376C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x377000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x377400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x377800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x377C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x378000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x378400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x378800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x378C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x379000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x379400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x379800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x379C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x37FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x380000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x380400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x380800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x380C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x381000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x381400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x381800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x381C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x382000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x382400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x382800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x382C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x383000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x383400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x383800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x383C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x384000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x384400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x384800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x384C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x385000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x385400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x385800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x385C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x386000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x386400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x386800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x386C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x387000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x387400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x387800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x387C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x388000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x388400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x388800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x388C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x389000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x389400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x389800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x389C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x38FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x390000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x390400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x390800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x390C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x391000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x391400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x391800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x391C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x392000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x392400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x392800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x392C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x393000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x393400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x393800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x393C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x394000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x394400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x394800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x394C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x395000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x395400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x395800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x395C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x396000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x396400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x396800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x396C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x397000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x397400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x397800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x397C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x398000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x398400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x398800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x398C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x399000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x399400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x399800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x399C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x39FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A0000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A1000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A5000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A5400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A5800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A5C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A6000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A6400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A6800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A6C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A7000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A7400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A7800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A7C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A8000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A8400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A8800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A8C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A9000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A9400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A9800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3A9C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AA000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AA400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AA800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AAC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AB000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AB400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AB800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3ABC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AC000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AC400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AC800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3ACC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AD000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AD400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AD800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3ADC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AE000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AE400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AF000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AF400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AF800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3AFC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B0000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B1000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B5000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B5400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B5800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B5C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B6000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B6400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B6800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B6C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B7000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B7400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B7800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B7C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B8000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B8400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B8800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B8C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B9000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B9400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B9800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3B9C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BA000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BA400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BA800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BAC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BB000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BB400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BB800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BBC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BC000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BC400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BC800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BCC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BD000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BD400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BD800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BDC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BE000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BE400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BF000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BF400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BF800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3BFC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C0000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C1000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C5000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C5400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C5800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C5C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C6000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C6400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C6800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C6C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C7000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C7400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C7800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C7C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C8000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C8400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C8800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C8C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C9000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C9400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C9800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3C9C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CA000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CA400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CA800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CAC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CB000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CB400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CB800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CBC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CC000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CC400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CC800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CCC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CD000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CD400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CD800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CDC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CE000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CE400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CF000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CF400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CF800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3CFC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D0000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D1000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D5000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D5400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D5800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D5C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D6000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D6400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D6800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D6C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D7000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D7400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D7800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D7C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D8000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D8400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D8800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D8C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D9000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D9400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D9800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3D9C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DA000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DA400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DA800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DAC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DB000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DB400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DB800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DBC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DC000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DC400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DC800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DCC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DD000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DD400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DD800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DDC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DE000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DE400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DF000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DF400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DF800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3DFC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E0000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E1000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E5000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E5400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E5800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E5C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E6000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E6400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E6800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E6C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E7000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E7400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E7800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E7C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E8000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E8400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E8800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E8C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E9000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E9400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E9800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3E9C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EA000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EA400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EA800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EAC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EB000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EB400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EB800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EBC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EC000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EC400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EC800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3ECC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3ED000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3ED400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3ED800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EDC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EE000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EE400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EF000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EF400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EF800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3EFC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F0000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F1000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F5000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F5400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F5800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F5C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F6000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F6400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F6800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F6C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F7000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F7400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F7800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F7C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F8000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F8400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F8800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F8C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F9000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F9400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F9800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3F9C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FA000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FA400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FA800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FAC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FB000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FB400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FB800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FBC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FC000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FC400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FC800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FCC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FD000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FD400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FD800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FDC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FE000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FE400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FF000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FF400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FF800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x3FFC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x400000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x400400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x400800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x400C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x401000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x401400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x401800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x401C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x402000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x402400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x402800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x402C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x403000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x403400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x403800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x403C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x404000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x404400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x404800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x404C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x405000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x405400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x405800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x405C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x406000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x406400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x406800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x406C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x407000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x407400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x407800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x407C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x408000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x408400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x408800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x408C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x409000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x409400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x409800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x409C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x40FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x410000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x410400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x410800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x410C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x411000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x411400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x411800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x411C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x412000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x412400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x412800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x412C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x413000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x413400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x413800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x413C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x414000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x414400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x414800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x414C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x415000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x415400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x415800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x415C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x416000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x416400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x416800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x416C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x417000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x417400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x417800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x417C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x418000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x418400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x418800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x418C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x419000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x419400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x419800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x419C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x41FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x420000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x420400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x420800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x420C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x421000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x421400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x421800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x421C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x422000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x422400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x422800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x422C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x423000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x423400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x423800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x423C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x424000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x424400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x424800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x424C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x425000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x425400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x425800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x425C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x426000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x426400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x426800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x426C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x427000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x427400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x427800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x427C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x428000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x428400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x428800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x428C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x429000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x429400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x429800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x429C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x42FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x430000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x430400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x430800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x430C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x431000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x431400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x431800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x431C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x432000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x432400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x432800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x432C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x433000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x433400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x433800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x433C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x434000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x434400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x434800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x434C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x435000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x435400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x435800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x435C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x436000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x436400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x436800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x436C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x437000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x437400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x437800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x437C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x438000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x438400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x438800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x438C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x439000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x439400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x439800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x439C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x43FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x440000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x440400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x440800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x440C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x441000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x441400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x441800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x441C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x442000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x442400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x442800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x442C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x443000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x443400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x443800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x443C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x444000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x444400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x444800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x444C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x445000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x445400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x445800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x445C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x446000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x446400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x446800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x446C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x447000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x447400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x447800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x447C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x448000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x448400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x448800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x448C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x449000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x449400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x449800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x449C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x44FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x450000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x450400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x450800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x450C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x451000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x451400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x451800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x451C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x452000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x452400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x452800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x452C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x453000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x453400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x453800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x453C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x454000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x454400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x454800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x454C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x455000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x455400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x455800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x455C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x456000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x456400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x456800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x456C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x457000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x457400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x457800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x457C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x458000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x458400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x458800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x458C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x459000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x459400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x459800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x459C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x45FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x460000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x460400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x460800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x460C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x461000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x461400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x461800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x461C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x462000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x462400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x462800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x462C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x463000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x463400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x463800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x463C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x464000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x464400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x464800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x464C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x465000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x465400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x465800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x465C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x466000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x466400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x466800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x466C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x467000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x467400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x467800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x467C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x468000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x468400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x468800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x468C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x469000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x469400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x469800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x469C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x46FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x470000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x470400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x470800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x470C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x471000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x471400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x471800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x471C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x472000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x472400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x472800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x472C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x473000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x473400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x473800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x473C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x474000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x474400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x474800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x474C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x475000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x475400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x475800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x475C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x476000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x476400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x476800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x476C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x477000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x477400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x477800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x477C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x478000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x478400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x478800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x478C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x479000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x479400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x479800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x479C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x47FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x480000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x480400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x480800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x480C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x481000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x481400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x481800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x481C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x482000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x482400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x482800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x482C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x483000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x483400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x483800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x483C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x484000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x484400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x484800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x484C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x485000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x485400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x485800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x485C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x486000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x486400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x486800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x486C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x487000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x487400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x487800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x487C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x488000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x488400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x488800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x488C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x489000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x489400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x489800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x489C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x48FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x490000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x490400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x490800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x490C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x491000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x491400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x491800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x491C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x492000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x492400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x492800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x492C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x493000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x493400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x493800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x493C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x494000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x494400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x494800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x494C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x495000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x495400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x495800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x495C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x496000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x496400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x496800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x496C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x497000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x497400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x497800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x497C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x498000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x498400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x498800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x498C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x499000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x499400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x499800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x499C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49A000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49A400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49A800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49AC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49B000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49B400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49B800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49BC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49C000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49C400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49C800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49CC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49D000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49D400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49D800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49DC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49E000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49E400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49E800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49EC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49F000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49F400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49F800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x49FC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A0000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A1000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A5000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A5400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A5800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A5C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A6000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A6400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A6800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A6C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A7000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A7400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A7800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A7C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A8000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A8400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A8800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A8C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A9000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A9400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A9800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4A9C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AA000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AA400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AA800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AAC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AB000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AB400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AB800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4ABC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AC000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AC400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AC800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4ACC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AD000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AD400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AD800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4ADC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AE000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AE400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AE800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AEC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AF000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AF400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AF800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4AFC00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B0000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B0400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B0800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B0C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B1000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B1400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B1800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B1C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B2000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B2400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B2800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B2C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B3000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B3400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B3800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B3C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B4000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B4400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B4800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B4C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B5000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B5400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B5800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B5C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B6000    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B6400    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B6800    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+0x4B6C00    1024    0.000    0.0%  100.0%  EMPTY/ERASED          DATA
+
+================================================================================
+SECTION 2: WHAT THE ENCRYPTED REGIONS CONTAIN
+================================================================================
+
+By comparing the encrypted regions to known ME firmware structures,
+we can determine what each region stores.
+
+  0x000000-0x020000 (   128KB) Flash Descriptor Region
+    Entropy: 6.525/8.0 | Description: FDR + ME partition table
+    Readable strings: 144
+
+  0x020000-0x062000 (   264KB) ROMB + PMCP
+    Entropy: 4.910/8.0 | Description: ROM Bypass code + Power Management
+    Readable strings: 154
+
+  0x062000-0x135000 (   844KB) FTPR Encrypted
+    Entropy: 7.870/8.0 | Description: Main firmware partition (ENCRYPTED)
+    Readable strings: 1278
+
+  0x135000-0x1CA000 (   596KB) ARC Boot ROM
+    Entropy: 5.757/8.0 | Description: Unencrypted boot code + DMA
+    Readable strings: 718
+
+  0x1CA000-0x210000 (   280KB) Mid Region
+    Entropy: 6.374/8.0 | Description: IOMP + NPHY + TBTP modules
+    Readable strings: 412
+
+  0x210000-0x2A0000 (   576KB) Certificate Region
+    Entropy: 5.261/8.0 | Description: 13 X.509 certs + JSON configs
+    Readable strings: 576
+
+  0x2A0000-0x350000 (   704KB) NFTP Encrypted
+    Entropy: 7.967/8.0 | Description: Network File Transfer (ENCRYPTED)
+    Readable strings: 1115
+
+  0x350000-0x4B7000 (  1436KB) Data Region
+    Entropy: 0.531/8.0 | Description: DATA_PARTITION + NVAR store
+    Readable strings: 103
+
+
+================================================================================
+SECTION 3: THE ENCRYPTION LAYERS
+================================================================================
+
+Intel ME uses multiple encryption layers. We can identify them by
+analyzing entropy transitions and block boundaries.
+
+  Encryption boundary detection:
+  Found 102 entropy transitions (encryption boundaries):
+    0x002000: entropy 0.36 -> 4.18 (MORE encrypted)
+    0x003000: entropy 4.18 -> 7.70 (MORE encrypted)
+    0x019000: entropy 7.87 -> 3.49 (LESS encrypted)
+    0x01A000: entropy 3.49 -> 0.00 (LESS encrypted)
+    0x03A000: entropy 6.81 -> 5.38 (LESS encrypted)
+    0x03B000: entropy 5.38 -> 4.22 (LESS encrypted)
+    0x03C000: entropy 4.22 -> 6.21 (MORE encrypted)
+    0x048000: entropy 4.90 -> 2.62 (LESS encrypted)
+    0x049000: entropy 2.62 -> 0.00 (LESS encrypted)
+    0x064000: entropy 4.09 -> 7.64 (MORE encrypted)
+    0x076000: entropy 7.92 -> 5.32 (LESS encrypted)
+    0x077000: entropy 5.32 -> 7.69 (MORE encrypted)
+    0x092000: entropy 7.92 -> 4.53 (LESS encrypted)
+    0x093000: entropy 4.53 -> 7.84 (MORE encrypted)
+    0x0CB000: entropy 7.92 -> 6.90 (LESS encrypted)
+    0x0CC000: entropy 6.90 -> 4.98 (LESS encrypted)
+    0x0CD000: entropy 4.98 -> 3.17 (LESS encrypted)
+    0x0CE000: entropy 3.17 -> 0.01 (LESS encrypted)
+    0x0CF000: entropy 0.01 -> 1.61 (MORE encrypted)
+    0x0D1000: entropy 0.97 -> 7.91 (MORE encrypted)
+
+  KEY FINDING: The firmware has MULTIPLE encryption zones, not just one.
+  This means different modules are encrypted with different keys/IVs.
+  This is called "per-module encryption" — each module has its own
+  encryption context, making it harder to decrypt everything at once.
+
+
+================================================================================
+SECTION 4: WHAT WE CAN LEARN FROM ENCRYPTED BYTE PATTERNS
+================================================================================
+
+Even encrypted data has patterns that reveal structure.
+
+  Repeated byte patterns in encrypted FTPR (0x062000-0x135000):
+  Total 16-byte blocks: 54016
+  Unique patterns: 51184
+  Most common patterns (appear 3+ times):
+    FF FF FF FF FF FF FF FF... : 1702x
+    00 00 00 00 00 00 00 00... : 955x
+    FB F7 EF DF BF 7E FD FB... : 14x
+    BF 7E FD FB F7 EF DF BF... : 13x
+    EF DF BF 7E FD FB F7 EF... : 12x
+    DF BF 7E FD FB F7 EF DF... : 12x
+    F7 EF DF BF 7E FD FB F7... : 11x
+    7E FD FB F7 EF DF BF 7E... : 11x
+    FD FB F7 EF DF BF 7E FD... : 10x
+    00 00 00 00 00 00 00 00... : 7x
+    07 07 07 07 07 07 07 07... : 7x
+    9A DC 66 B7 19 AD C6 6B... : 5x
+    6B 71 9A DC 66 B7 19 AD... : 4x
+    71 9A DC 66 B7 19 AD C6... : 4x
+    C6 6B 71 9A DC 66 B7 19... : 4x
+    66 B7 19 AD C6 6B 71 9A... : 4x
+    DE 69 92 4B D4 99 DE F1... : 3x
+    37 9B CD E6 F3 79 BC DE... : 3x
+    DE 6F 37 9B CD E6 F3 79... : 3x
+    6F 37 9B CD E6 F3 79 BC... : 3x
+
+================================================================================
+SECTION 5: HECI INTERFACE COMMAND STRUCTURE
+================================================================================
+
+The HECI/MEI interface is how the OS communicates with ME.
+We can analyze the driver to understand what commands ME accepts.
+
+  MEIx64.sys driver analysis (from MEInfo output):
+    Driver version: 2220.3.1.0
+    Service name: MEIx64
+    PCI device:VEN_8086&DEV_51E0
+
+  Known HECI command groups (from Intel documentation):
+    Group 0x00: MEI/HECI bus management
+    Group 0x01: AMT/Provisioning
+    Group 0x03: ASF (Alert Standard Format)
+    Group 0x04: Intel Boot Guard
+    Group 0x05: FPF (Flash Protection)
+    Group 0x06: TLK (Third Party Key)
+    Group 0x07: EPID (Enhanced Privacy ID)
+    Group 0x08: Capability Reporting
+    Group 0x09: Host Configuration
+    Group 0x0A: Power Management
+    Group 0x0B: DAL (Device Access Layer)
+    Group 0x0C: Secure Boot
+    Group 0x0D: Manufacturing
+    Group 0x0E: Debug
+
+  ME responds to these commands via the MEI driver.
+  Each command group has sub-commands that reveal ME capabilities.
+
+================================================================================
+SECTION 6: FIRMWARE UPDATE STRUCTURE
+================================================================================
+
+Intel ME firmware updates are delivered as encrypted packages.
+The UPDATE PROCESS reveals code structure.
+
+  ME firmware update flow:
+    1. Lenovo downloads ME update from Intel (encrypted .bin)
+    2. BIOS vendor (Insyde) embeds it in BIOS update
+    3. BIOS update flashes ME region via SPI
+    4. ME verifies the update using Intel's signing key
+    5. ME decrypts and installs the update
+
+  What this reveals:
+    - ME has a self-update mechanism (fwupdate module)
+    - Updates are signed by Intel (cannot be modified)
+    - ME decrypts updates using its hardware key
+    - The update format is standard ME firmware image
+
+  We can analyze the update structure:
+    - FPT (Flash Partition Table) header at offset 0x000000
+    - Each partition has a 16-byte header
+    - Module entries have 12-byte names + offset/size/metadata
+    - The structure is the SAME in encrypted and unencrypted regions
+
+================================================================================
+SECTION 7: WHAT JTAG/SWD DEBUG PORTS COULD REVEAL
+================================================================================
+
+If we could access the PCH's debug interface, we could:
+  1. Set breakpoints in ME code
+  2. Step through ME execution
+  3. Read ME registers and memory
+  4. Dump decrypted firmware at runtime
+
+  PCH debug interface possibilities:
+    - JTAG: Standard debug interface on many chips
+    - SWD: Serial Wire Debug (ARM-style, but ARC uses similar)
+    - Intel-specific: DCI (Direct Connect Interface)
+
+  Known debug ports on Intel PCH:
+    - USB DCI: Exposed via USB Type-C on some boards
+    - JTAG: Usually requires board-level test points
+    - SPI: Already used for firmware dump
+
+  Lenovo IdeaPad Gaming 3 15IAH7 debug status:
+    - DCI: Likely disabled (Consumer laptop)
+    - JTAG: Test points may exist on motherboard
+    - SPI: Already accessed (we dumped the firmware)
+
+  VERDICT: Debug ports are likely locked on Consumer hardware.
+  Enterprise/vPro boards sometimes have debug access.
+
+================================================================================
+SECTION 8: SIDE-CHANNEL ATTACK POTENTIAL
+================================================================================
+
+Side-channel attacks observe physical properties during execution:
+  - Power consumption (DPA - Differential Power Analysis)
+  - Electromagnetic emissions (TEMPEST)
+  - Timing (cache-timing attacks)
+  - Sound (acoustic cryptanalysis)
+
+  Side-channel attack feasibility:
+
+  Power Analysis (DPA):
+    - Requires: Oscilloscope ($500+), current probe ($200+)
+    - Difficulty: HIGH — ME uses constant-time crypto
+    - Time: Weeks of data collection
+    - Success probability: LOW
+
+  Electromagnetic (TEMPEST):
+    - Requires: Near-field probe ($1000+), spectrum analyzer ($5000+)
+    - Difficulty: VERY HIGH — ME has EM shielding
+    - Time: Months
+    - Success probability: VERY LOW
+
+  Timing Attacks:
+    - Requires: High-precision timer, cache access
+    - Difficulty: MEDIUM — but ME doesn't share cache with CPU
+    - Success probability: LOW
+
+  VERDICT: Side-channel attacks are theoretically possible
+  but practically infeasible for independent researchers.
+
+================================================================================
+SECTION 9: FAULT INJECTION ATTACKS
+================================================================================
+
+Fault injection (glitching) causes errors in hardware execution:
+  - Voltage glitching: Momentary voltage drop during execution
+  - Clock glitching: Skipping clock cycles
+  - Laser fault injection: Precise laser strikes on chip
+  - EM fault injection: Electromagnetic pulses
+
+  Fault injection feasibility:
+
+  Voltage Glitching:
+    - Requires: $50 glitching hardware (ChipWhisperer)
+    - Target: ME's encryption verification check
+    - Idea: Glitch the check to skip verification
+    - Problem: ME uses redundant checks, hard to bypass
+    - Success probability: LOW
+
+  Clock Glitching:
+    - Requires: Clock generator + FPGA
+    - Target: ME's boot sequence
+    - Idea: Skip the encryption initialization step
+    - Problem: ME's boot is designed to detect glitches
+    - Success probability: VERY LOW
+
+  Laser Fault Injection:
+    - Requires: $100,000+ equipment, cleanroom
+    - Target: Individual transistors in PCH die
+    - Idea: Disable encryption hardware directly
+    - Problem: Physically destructive, may destroy chip
+    - Success probability: LOW (and you lose the chip)
+
+  VERDICT: Fault injection is the most promising hardware attack
+  but requires significant investment and expertise.
+
+================================================================================
+SECTION 10: THE REAL PATH FORWARD
+================================================================================
+
+After analyzing every possible approach, here is the realistic path:
+
+  TIER 1: WHAT WE CAN DO NOW (Free/Cheap)
+    1. Fuzz the HECI/MEI interface from Windows
+       - Send commands to ME via MEIx64.sys driver
+       - Observe responses and error codes
+       - Map the complete command interface
+       - Tools: Python + ctypes + heci.dll
+
+    2. Analyze ME's runtime behavior
+       - Monitor ME's network traffic with Wireshark
+       - Track ME's memory access with Intel PT
+       - Profile ME's CPU usage via performance counters
+
+    3. Reverse-engineer the MEI driver
+       - MEIx64.sys contains the OS-side HECI protocol
+       - Disassemble it with Ghidra to find command IDs
+       - Map every command ME accepts
+
+  TIER 2: WHAT WE CAN DO WITH MODERATE INVESTMENT ($100-$1000)
+    1. CH341A SPI programmer for direct flash access
+       - Read/write SPI flash directly
+       - Compare with ME-dumped firmware
+       - Verify ME's flash protection mechanisms
+
+    2. Logic analyzer on SPI bus
+       - Capture ME's flash access patterns
+       - See what ME reads during boot
+       - Identify which modules are loaded when
+
+  TIER 3: WHAT REQUIRES SIGNIFICANT INVESTMENT ($10,000+)
+    1. ChipWhisperer for voltage glitching
+       - Target ME's boot verification
+       - Attempt to bypass encryption check
+       - May reveal decrypted code at runtime
+
+    2. JTAG/SWD debug access
+       - Find test points on PCH
+       - Connect hardware debugger
+       - Step through ME execution
+
+  TIER 4: WHAT REQUIRES LABORATORY ($100,000+)
+    1. Full side-channel analysis
+    2. Laser fault injection
+    3. Chip decapping and fuse reading
+
+================================================================================
+THE BOTTOM LINE
+================================================================================
+
+The encrypted firmware IS accessible — but not through software.
+
+The path Intel engineers use:
+  1. They write code in C/ARC assembly
+  2. They compile it with Intel's proprietary toolchain
+  3. They encrypt it with Intel's hardware key
+  4. They sign it with Intel's signing key
+  5. They distribute it to BIOS vendors
+  6. BIOS vendors embed it in BIOS updates
+  7. ME decrypts it at boot using hardware fuses
+
+To reverse this process, you'd need:
+  - Access to Intel's encryption key (hardware fuses)
+  - OR ability to intercept decrypted code at runtime
+  - OR ability to bypass the encryption check
+
+The most realistic path for us:
+  1. Fuzz the HECI interface (no cost)
+  2. Reverse-engineer MEIx64.sys (no cost)
+  3. Monitor ME network traffic (no cost)
+  4. Use Intel PT to trace ME execution (no cost)
+  5. Build a CH341A programmer for direct flash access ($5)
+
+These approaches won't give us the decrypted code, but they WILL
+give us a deeper understanding of ME's behavior and capabilities.
+
+THE ENCRYPTION IS A BARRIER, NOT A WALL.
+We can still learn a LOT from the outside.
+
+================================================================================
+ANALYSIS COMPLETE
+================================================================================
