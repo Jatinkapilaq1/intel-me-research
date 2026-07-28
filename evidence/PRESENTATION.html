@@ -122,7 +122,7 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <body>
 
 <div id="progress" style="width:0%"></div>
-<div id="pagenum">01 / 11</div>
+<div id="pagenum">01 / 16</div>
 <div id="navdots"></div>
 <div id="tooltip"></div>
 
@@ -487,7 +487,7 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <!-- SLIDE 10: THE SMOKING GUN -->
 <div class="slide" id="s10">
 <div class="inner">
-  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 10 of 12</div>
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 10 of 16</div>
   <h2>The <span class="err">Smoking Gun</span>: Inside ME's Surveillance Architecture</h2>
   <p>After decoding the firmware's internal module manifest, we found the exact components that give Intel ME its surveillance capabilities. These aren't theories &mdash; they are <strong>named modules</strong> with <strong>binary offsets</strong>, extracted from a live firmware dump of this laptop.</p>
 
@@ -577,7 +577,7 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <!-- SLIDE 11: THE CAPABILITY MATRIX -->
 <div class="slide" id="s11">
 <div class="inner">
-  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 11 of 12</div>
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 11 of 16</div>
   <h2>Module Surveillance <span class="err">Capability Matrix</span></h2>
   <p>Each row is a ME firmware module. Each column is a surveillance capability we searched for. A number means the keyword was found that many times inside that module's binary data.</p>
 
@@ -767,6 +767,219 @@ Found at offsets:
 </div>
 </div>
 
+<!-- SLIDE 13: DRIVER REVERSE-ENGINEERING -->
+<div class="slide" id="s13">
+<div class="inner">
+  <div class="label"><span class="tag tag-purple">NEW</span> Slide 13 of 16</div>
+  <h2>Driver Reverse-Engineering: Intel's Internal Structure</h2>
+  <p>Binary analysis of <span class="tip" data-tip="TeeDriverW10x64.sys — Intel's Trusted Execution Environment driver for Windows, used by Lenovo instead of Intel's standard MEI driver. It handles communication between the OS and Intel ME">TeeDriverW10x64.sys</span> (318 KB) reveals Intel's internal build system, source code structure, and the ME communication protocol.</p>
+
+  <div class="dia">
+    <div class="dia-trigger" onclick="event.stopPropagation();toggleDia(this)"><span class="arrow">&#9654;</span> EXPAND: Intel Internal Build Path (Source Code Structure)</div>
+    <div class="dia-panel"><div class="dia-inner">
+      <h3 style="color:#d2a8ff;margin-bottom:12px">Intel's Source Code Tree (from debug strings)</h3>
+      <div class="hex"><span class="key">D:\buildagent-cd_8817\p4\991594082\drivers\TeeDriver\TEEDriver\</span>
+  ├── ClientManagement/
+  │   └── <span class="warn">AsyncEventModel.c</span>     Async event handling (ME -> CPU notifications)
+  ├── HAL/
+  │   ├── <span class="warn">hal_core.c</span>             Hardware Abstraction Layer core
+  │   └── MEI/
+  │       └── <span class="err">mei_hal.c</span>             MEI hardware interface layer (direct register access)
+  ├── Power/
+  │   └── <span class="warn">Power.c</span>                 D0/D3 power state transitions
+  ├── Queue.c                            I/O request queue (KMDF framework)
+  ├── Timers.c                           Watchdog timer management
+  └── x64/PgPoFxWin10release/
+      └── TEEDriverW10x64.pdb            Debug symbols (not included)</div>
+      <p style="margin-top:12px">Intel builds their HECI driver from 6 source files. The <code>mei_hal.c</code> file contains the direct hardware register access for the <span class="tip" data-tip="Host Embedded Controller Interface — the hardware link between ME and the CPU. This is how they talk to each other">HECI/MEI interface</span>. The <code>AsyncEventModel.c</code> handles asynchronous notifications from ME.</p>
+    </div></div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <h3>Internal Function Names</h3>
+      <p>The driver exposes these function names through debug strings:</p>
+      <ul>
+        <li><code>ClientsSetValidFWClients</code> — validates ME firmware client list</li>
+        <li><code>ClientsAddFWClientProperties</code> — registers ME client capabilities</li>
+        <li><code>ClientsSetFWClientFixedAddressUsed</code> — fixed address DMA mapping</li>
+        <li><code>HalHeciReset</code> — HECI bus reset (STOP IDLE -> RESET)</li>
+        <li><code>ClientsEvtInterfaceReady</code> — ME interface ready callback</li>
+        <li><code>WdTimerTic / WdTimerInterval</code> — watchdog timer</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>6 Firmware Status Registers</h3>
+      <p>The driver reads 6 x 32-bit <span class="tip" data-tip="Firmware Status Register — hardware registers that report ME's current state. Each register contains different status bits">FWSTS</span> registers from ME:</p>
+      <div class="hex">CSME FW status:
+  FWSTS1: 0x%08x  <span class="dim">← ME state, error code, operation mode</span>
+  FWSTS2: 0x%08x  <span class="dim">← Boot status, secure boot</span>
+  FWSTS3: 0x%08x  <span class="dim">← Configuration state</span>
+  FWSTS4: 0x%08x  <span class="dim">← Security policy</span>
+  FWSTS5: 0x%08x  <span class="dim">← HECI bus state</span>
+  FWSTS6: 0x%08x  <span class="dim">← Extended status</span></div>
+      <p>Each register contains different status bits. This is how Intel tools query ME state without firmware cooperation.</p>
+    </div>
+    <div class="card">
+      <h3>SKU Detection</h3>
+      <p>Driver contains <code>S.K.U. .%.d</code> — dynamically reads ME SKU at runtime. On this laptop, ME is <strong>Consumer LP</strong> (no AMT). The driver configures itself based on SKU: Consumer gets basic HECI, AMT gets full remote management.</p>
+    </div>
+    <div class="card">
+      <h3>Driver Signing Chain</h3>
+      <p>Signed by <strong>Intel Corporation</strong> via Sectigo (formerly Comodo), rooted at <strong>USERTrust RSA</strong>. Timestamped by Microsoft. This is a production-signed kernel driver running in Ring 0.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 14: ARC ENGINE ARCHITECTURE -->
+<div class="slide" id="s14">
+<div class="inner">
+  <div class="label"><span class="tag tag-purple">NEW</span> Slide 14 of 16</div>
+  <h2>ARC Engine Architecture: ME's Hardware Blocks</h2>
+  <p>The unencrypted <span class="tip" data-tip="Synopsys ARC EM — a tiny, low-power processor core. The CPU inside Intel ME. Different from the main Intel x86 CPU">ARC EM</span> code region contains 14 named hardware engine structures. These are the actual building blocks that ME uses for all operations.</p>
+
+  <div class="dia">
+    <div class="dia-trigger" onclick="event.stopPropagation();toggleDia(this)"><span class="arrow">&#9654;</span> EXPAND: Complete Engine Map with Binary Offsets</div>
+    <div class="dia-panel"><div class="dia-inner">
+      <h3 style="color:#d2a8ff;margin-bottom:12px">ARC Engine Labels (from unencrypted firmware)</h3>
+      <div class="hex"><span class="dim">Offset   Label             Full Name                          Purpose</span>
+<span class="dim">------   -----             ---------                          -------</span>
+<span class="err">1C55AC   APP EM</span>           Application Emulator               Emulated app execution
+<span class="key">1C5740   DROM</span>             Data ROM                           Read-only constants
+<span class="key">1C576C   INTEL</span>            Intel identifier                   Proprietary marker
+<span class="key">1C5950   ARC PARM</span>         ARC Parameters                     Processor config
+<span class="warn">1C5A70   PtoSPtoQWake</span>     Power-to-Sleep/Query Wake          S3/S4/S5 power transitions
+<span class="err">1C5B40   EE_CIO</span>           Custom I/O Engine                  Hardware I/O operations
+<span class="err">1C5F40   EE_DMA</span>           DMA Engine                         Direct Memory Access
+<span class="dim">1C6140   EE_RESERVED_12</span>   Reserved Engine 12                 Undocumented slot
+<span class="dim">1C6340   EE_RESERVED_13</span>   Reserved Engine 13                 Undocumented slot
+<span class="err">1C6540   EE_LC</span>            Low-level Communication Engine    HECI protocol engine
+<span class="err">1C6940   PATCHES</span>          Runtime Patches                    Code patching at runtime
+<span class="key">1C6D10   DP_IN_U_CODE</span>     Input Microcode                    Input processing
+<span class="key">1C6DA0   CONFIG</span>           Configuration                      Runtime config params
+<span class="key">1BB0C0   _RDKPCT_</span>         RDK Processor Counter Timer        Performance counters</div>
+    </div></div>
+  </div>
+
+  <div class="cards">
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">EE_DMA — Direct Memory Access Engine</h3>
+      <p>Hardware block at <code>0x1C5F40</code> that can read/write system RAM <strong>independently of the CPU</strong>. This is not software — it's a dedicated DMA controller inside the ME coprocessor. The driver's <code>ClientsSetFWClientFixedAddressUsed</code> function configures fixed-address DMA mappings.</p>
+    </div>
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">EE_LC — HECI Protocol Engine</h3>
+      <p>Hardware block at <code>0x1C6540</code> that implements the <span class="tip" data-tip="Host Embedded Controller Interface — the hardware protocol that allows the OS to communicate with Intel ME. Uses message-based I/O through PCI MMIO bars">HECI/MEI protocol</span>. This is the PHYSICAL LINK between ME and the CPU. All ME communication flows through this engine.</p>
+    </div>
+    <div class="card" style="border-color:rgba(240,136,62,.3)">
+      <h3 style="color:#f0883e">PATCHES — Runtime Code Modification</h3>
+      <p>Engine at <code>0x1C6940</code> that can <strong>patch ME's own code at runtime</strong>. This means even if you could dump ME's memory, the code might be different from what's stored in the flash chip. ME modifies itself while running.</p>
+    </div>
+    <div class="card" style="border-color:rgba(88,166,255,.3)">
+      <h3 style="color:#58a6ff">PtoSPtoQWake — Independent Power Management</h3>
+      <p>Engine at <code>0x1C5A70</code> handles S3/S4/S5 power transitions <strong>independently of the main CPU</strong>. ME decides when to sleep, when to wake, and what to do during sleep. This runs even when the laptop appears completely off.</p>
+    </div>
+    <div class="card" style="border-color:rgba(210,168,255,.3)">
+      <h3 style="color:#d2a8ff">APP EM — Application Emulator</h3>
+      <p>Engine at <code>0x1C55AC</code> that executes emulated application code on the ARC processor. This suggests ME can run third-party or OEM-specific applications inside its own isolated environment.</p>
+    </div>
+    <div class="card">
+      <h3>2 Reserved Engine Slots</h3>
+      <p><code>EE_RESERVED_12</code> and <code>EE_RESERVED_13</code> are documented but unused engine slots. These could be for future ME features, OEM customization, or undocumented capabilities. Their existence proves ME's engine architecture is extensible.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 15: HECI CLIENT MAP -->
+<div class="slide" id="s15">
+<div class="inner">
+  <div class="label"><span class="tag tag-purple">NEW</span> Slide 15 of 16</div>
+  <h2>HECI Client Map: ME's Internal Services</h2>
+  <p>Binary analysis of <span class="tip" data-tip="MEInfoWin64 — Intel's diagnostic tool that queries ME status via the HECI interface. The error messages reveal ME's internal client architecture">MEInfoWin64.exe</span> reveals 10 registered <span class="tip" data-tip="HECI Client — each client is a 'service' inside ME that handles a specific function. Like apps on a phone, but running inside the ME coprocessor">HECI clients</span> inside ME. Each client handles a specific subsystem.</p>
+
+  <table>
+    <tr><th>HECI Client</th><th>Full Name</th><th>Purpose</th><th>Risk</th></tr>
+    <tr>
+      <td><strong style="color:#f85149">FW Update</strong></td>
+      <td>Firmware Update Client</td>
+      <td>Self-firmware-update — ME can flash its own firmware. Survives OS reinstall, BIOS update, hard drive replacement.</td>
+      <td><span class="tag tag-red">CRITICAL</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#f85149">AMT</strong></td>
+      <td>Active Management Technology</td>
+      <td>Remote management — full out-of-band access to the system. KVM (keyboard/video/mouse), file transfer, remote power control. <strong>Not present on Consumer SKU but the client code remains.</strong></td>
+      <td><span class="tag tag-red">CRITICAL</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#f0883e">HCDP/PAVP</strong></td>
+      <td>HDCP / Protected Audio Video Path</td>
+      <td>DRM content protection — decrypts streaming video (Netflix 4K, etc.) inside ME, outside the OS's reach.</td>
+      <td><span class="tag tag-yellow">HIGH</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#f0883e">MCA</strong></td>
+      <td>Management Component Architecture</td>
+      <td>ME's internal management bus — coordinates operations between all other clients.</td>
+      <td><span class="tag tag-yellow">HIGH</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">ICC Fixed</strong></td>
+      <td>Internal Communication Controller</td>
+      <td>Fixed-address communication channel between ME and PCH hardware.</td>
+      <td><span class="tag tag-blue">MEDIUM</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">HCI</strong></td>
+      <td>Host Controller Interface</td>
+      <td>Low-level host communication — raw hardware link management.</td>
+      <td><span class="tag tag-blue">MEDIUM</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">PSR</strong></td>
+      <td>Platform Security Runtime</td>
+      <td>Security policy enforcement — manages access control, encryption policies, and security state.</td>
+      <td><span class="tag tag-blue">MEDIUM</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">UPID</strong></td>
+      <td>Unique Platform ID</td>
+      <td>Platform identification — reads hardware fuses to determine device identity and capabilities.</td>
+      <td><span class="tag tag-blue">MEDIUM</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#d2a8ff">HOTHAM</strong></td>
+      <td>Unknown (Codename)</td>
+      <td>Undocumented client — possibly thermal management or a development codename.</td>
+      <td><span class="tag tag-purple">UNKNOWN</span></td>
+    </tr>
+    <tr>
+      <td><strong style="color:#8b949e">Unknown</strong></td>
+      <td>Unmapped Client</td>
+      <td>Placeholder for clients not recognized by MEInfoWin64.</td>
+      <td><span class="tag tag-purple">UNKNOWN</span></td>
+    </tr>
+  </table>
+
+  <div class="cards">
+    <div class="card card-full" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">The HECI Link Reset Sequence</h3>
+      <p>MEInfoWin64 reveals the HECI bus reset protocol: <code>HECI_LINK_RESET_START</code> &rarr; <code>HECI_LINK_RESET_DONE</code>. This is the handshake that initializes communication between the CPU and ME. The driver's <code>HalHeciReset</code> function executes this sequence.</p>
+      <div class="hex"><span class="warn">HECI_LINK_RESET_START</span>  →  Driver sends reset command to ME
+<span class="val">HECI_LINK_RESET_DONE</span>   ←  ME confirms reset complete
+<span class="key">Protocol negotiation</span>   →  Driver queries ME's HECI protocol version
+<span class="key">Client enumeration</span>     →  Driver discovers available ME clients
+<span class="key">Event registration</span>     →  Driver registers for async ME events</div>
+    </div>
+  </div>
+
+  <hr>
+  <h3>Why This Matters</h3>
+  <p>Each HECI client is a potential communication channel between ME and the outside world. Even on Consumer SKU where AMT is disabled, the AMT client code <strong>remains in the firmware</strong>. The infrastructure for remote management exists — it's just gated by the SKU configuration. A vulnerability in any of these 10 clients could provide an attack vector into ME.</p>
+</div>
+</div>
+
 <script>
 // ========================
 // TOOLTIP SYSTEM
@@ -837,7 +1050,7 @@ function toggleDia(trigger) {
 // NAVIGATION
 // ========================
 var cur = 0;
-var total = 13;
+var total = 16;
 var slides = document.querySelectorAll('.slide');
 var navEl = document.getElementById('navdots');
 
