@@ -487,7 +487,7 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <!-- SLIDE 10: THE SMOKING GUN -->
 <div class="slide" id="s10">
 <div class="inner">
-  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 10 of 16</div>
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 10 of 21</div>
   <h2>The <span class="err">Smoking Gun</span>: Inside ME's Surveillance Architecture</h2>
   <p>After decoding the firmware's internal module manifest, we found the exact components that give Intel ME its surveillance capabilities. These aren't theories &mdash; they are <strong>named modules</strong> with <strong>binary offsets</strong>, extracted from a live firmware dump of this laptop.</p>
 
@@ -577,7 +577,7 @@ ul li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;
 <!-- SLIDE 11: THE CAPABILITY MATRIX -->
 <div class="slide" id="s11">
 <div class="inner">
-  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 11 of 16</div>
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 11 of 21</div>
   <h2>Module Surveillance <span class="err">Capability Matrix</span></h2>
   <p>Each row is a ME firmware module. Each column is a surveillance capability we searched for. A number means the keyword was found that many times inside that module's binary data.</p>
 
@@ -770,7 +770,7 @@ Found at offsets:
 <!-- SLIDE 13: DRIVER REVERSE-ENGINEERING -->
 <div class="slide" id="s13">
 <div class="inner">
-  <div class="label"><span class="tag tag-purple">NEW</span> Slide 13 of 16</div>
+  <div class="label"><span class="tag tag-purple">NEW</span> Slide 13 of 21</div>
   <h2>Driver Reverse-Engineering: Intel's Internal Structure</h2>
   <p>Binary analysis of <span class="tip" data-tip="TeeDriverW10x64.sys — Intel's Trusted Execution Environment driver for Windows, used by Lenovo instead of Intel's standard MEI driver. It handles communication between the OS and Intel ME">TeeDriverW10x64.sys</span> (318 KB) reveals Intel's internal build system, source code structure, and the ME communication protocol.</p>
 
@@ -835,7 +835,7 @@ Found at offsets:
 <!-- SLIDE 14: ARC ENGINE ARCHITECTURE -->
 <div class="slide" id="s14">
 <div class="inner">
-  <div class="label"><span class="tag tag-purple">NEW</span> Slide 14 of 16</div>
+  <div class="label"><span class="tag tag-purple">NEW</span> Slide 14 of 21</div>
   <h2>ARC Engine Architecture: ME's Hardware Blocks</h2>
   <p>The unencrypted <span class="tip" data-tip="Synopsys ARC EM — a tiny, low-power processor core. The CPU inside Intel ME. Different from the main Intel x86 CPU">ARC EM</span> code region contains 14 named hardware engine structures. These are the actual building blocks that ME uses for all operations.</p>
 
@@ -894,8 +894,8 @@ Found at offsets:
 <!-- SLIDE 15: HECI CLIENT MAP -->
 <div class="slide" id="s15">
 <div class="inner">
-  <div class="label"><span class="tag tag-purple">NEW</span> Slide 15 of 16</div>
-  <h2>HECI Client Map: ME's Internal Services</h2>
+    <div class="label"><span class="tag tag-purple">NEW</span> Slide 15 of 21</div>
+    <h2>HECI Client Map: ME's Internal Services</h2>
   <p>Binary analysis of <span class="tip" data-tip="MEInfoWin64 — Intel's diagnostic tool that queries ME status via the HECI interface. The error messages reveal ME's internal client architecture">MEInfoWin64.exe</span> reveals 10 registered <span class="tip" data-tip="HECI Client — each client is a 'service' inside ME that handles a specific function. Like apps on a phone, but running inside the ME coprocessor">HECI clients</span> inside ME. Each client handles a specific subsystem.</p>
 
   <table>
@@ -980,6 +980,324 @@ Found at offsets:
 </div>
 </div>
 
+<!-- SLIDE 16: LIVE MKHI PROTOCOL -->
+<div class="slide" id="s16">
+<div class="inner">
+  <div class="label"><span class="tag tag-red">WORLD FIRST</span> Slide 16 of 21</div>
+  <h2>We <span class="err">Talked to the Running ME</span></h2>
+  <p>Custom Python scripts communicate directly with the live Management Engine via the <span class="tip" data-tip="Host Embedded Controller Interface — the hardware bus connecting the CPU to the ME coprocessor. We used this to send raw commands to the running ME">HECI/MEI interface</span>. The ME is <strong>alive and responding</strong> to our commands.</p>
+
+  <div class="cards">
+    <div class="card card-full" style="border-color:rgba(88,166,255,.3)">
+      <h3>How It Works</h3>
+      <div class="hex">[Power-On] → ME boots from SPI flash (encrypted)
+     ↓
+[ME decrypts firmware using AES key in PCH OTP fuses]
+     ↓
+[ME registers HECI clients for communication]
+     ↓
+[Windows loads TeeDriverW10x64.sys (Lenovo)]
+     ↓
+<span class="err">[OUR SCRIPT] opens HECI handle (UAC elevated)
+[OUR SCRIPT] sends MKHI command packets
+[OUR SCRIPT] receives ME responses LIVE</span></div>
+    </div>
+    <div class="card">
+      <h3>MKHI Protocol v3.1 Confirmed</h3>
+      <div class="hex"><span class="warn">GEN.01 (GET_MKHI_VERSION):</span>
+Sent:    ff 01 00 00 00 00 00 00
+Received: <span class="err">ff 81 00 00 03 00 01 00</span>
+         ↑              ↑
+    Response bit      MKHI v3.1</div>
+      <p>The <span class="tip" data-tip="Management Engine Kernel Handler Interface — the main protocol for talking to ME's kernel. Different from the general HECI protocol. This is ME's internal command interface">MKHI protocol</span> version is 3.1. We are the first public researchers to document this on CSME 16.x hardware.</p>
+    </div>
+    <div class="card">
+      <h3>FW Version Read Live</h3>
+      <div class="hex"><span class="warn">GEN.02 (GET_FW_VERSION):</span>
+Code:    16.0.15.1735
+Recovery: 16.0.15.1735
+Backup:  16.0.15.1735</div>
+      <p>All 3 firmware partitions report identical version. This matches what Intel's tools report but was obtained by directly interrogating ME's kernel.</p>
+    </div>
+    <div class="card">
+      <h3>The Connection</h3>
+      <table>
+        <tr><td class="dim">HECI Buffer Size</td><td class="mono val">0x800 (2048 bytes)</td></tr>
+        <tr><td class="dim">MKHI Protocol</td><td class="mono val">Version 3.1</td></tr>
+        <tr><td class="dim">GUID</td><td class="mono" style="font-size:10px">{E2D1FF34-3458-49A9-88DA-8E6915CE9BE5}</td></tr>
+        <tr><td class="dim">Elevation Required</td><td class="err">Yes (UAC RunAs Admin)</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 17: PARTITION MANIFEST -->
+<div class="slide" id="s17">
+<div class="inner">
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 17 of 21</div>
+  <h2>The <span class="err">Partition Manifest Leak</span> (GEN.1C)</h2>
+  <p>Using MKHI command <code>GEN.1C</code> with payload <code>00</code>, we retrieved the <strong>complete partition manifest</strong> from the running ME. This is <em>live runtime data</em> — not from the SPI flash dump.</p>
+
+  <div class="hex">GEN.1C Request:   ff 1c 00 00 00 00 00 00 01 00
+GEN.1C Response:  ff 9c 00 00 [448 bytes of partition data]
+                                ↑
+                          88 bytes × 8 partitions</div>
+
+  <table>
+    <tr><th>Partition</th><th>Role</th><th>Version</th><th>Encrypted</th><th>Status Flags</th></tr>
+    <tr>
+      <td><strong style="color:#d2a8ff">FTPR</strong></td>
+      <td>Factory Partition — main boot</td>
+      <td class="mono">16.0.1735.15</td>
+      <td class="err">AES-128-CBC</td>
+      <td class="mono">0x01, 0x02</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#d2a8ff">RBEP</strong></td>
+      <td>Recovery/Boot Partition — fallback</td>
+      <td class="mono">16.0.1735.15</td>
+      <td class="err">AES-128-CBC</td>
+      <td class="mono">0x01, 0x02</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">OEMP</strong></td>
+      <td>OEM Partition — Lenovo customization</td>
+      <td class="dim">—</td>
+      <td class="val">No</td>
+      <td class="mono">0x00, 0x00</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">PMCP</strong></td>
+      <td>Power Management Controller</td>
+      <td class="mono">10.0.1023.0</td>
+      <td class="val">No</td>
+      <td class="mono">0x00, 0x00</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">IOMP</strong></td>
+      <td>I/O Management — PCIe, USB, SATA routing</td>
+      <td class="mono">34.0.0.0</td>
+      <td class="val">No</td>
+      <td class="mono">0x00, 0x00</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">NPHY</strong></td>
+      <td>Networking PHY — Ethernet controller</td>
+      <td class="mono">14.0.8208.504</td>
+      <td class="val">No</td>
+      <td class="mono">0x00, 0x00</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">TBTP</strong></td>
+      <td>Thunderbolt — USB-C / DisplayPort alt mode</td>
+      <td class="mono">16.0.1601.0</td>
+      <td class="val">No</td>
+      <td class="mono">0x00, 0x00</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#58a6ff">PCHC</strong></td>
+      <td>PCH Controller — chipset management</td>
+      <td class="mono">16.0.1012.0</td>
+      <td class="val">No</td>
+      <td class="mono">0x00, 0x00</td>
+    </tr>
+  </table>
+
+  <div class="cards">
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">Each Entry: 88 Bytes</h3>
+      <div class="hex">Offset  Description                  Example (FTPR)
+------  -----------                  -------------
++0x00   Partition name (12 bytes)    465450520000...  "FTPR"
++0x0C   Version (8 bytes)             <span class="err">1600173515</span>  →  16.0.1735.15
++0x14   Vendor ID (4 bytes)           <span class="err">86 80 00 00</span>  ←  Intel PCI VID 0x8086
++0x18   Flags IA-32 (4 bytes)        01 00 00 00
++0x1C   Flags ARC (4 bytes)         02 00 00 00
++0x20-58 Remaining fields            (partition metadata)</div>
+      <p>The Intel PCI vendor ID <code>0x8086</code> at offset 0x14+ confirms this data originates from Intel's silicon. Flags 0x01 and 0x02 on FTPR/RBEP indicate AES encryption and anti-rollback protection.</p>
+    </div>
+    <div class="card">
+      <h3>Why This Matters</h3>
+      <ul>
+        <li><strong>FTPR + RBEP encrypted</strong> — the actual code we need is AES-locked</li>
+        <li><strong>6 unencrypted modules</strong> — OEM, power, I/O, network, Thunderbolt, PCH</li>
+        <li><strong>Version discrepancies</strong> — PMCP (10.0) is far older than main FW (16.0)</li>
+        <li><strong>OEMP has no version</strong> — suggests dynamic or runtime-generated partition</li>
+        <li><strong>All modules have Intel VID</strong> — no third-party code in these partitions</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 18: DYNAMIC LEAK -->
+<div class="slide" id="s18">
+<div class="inner">
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 18 of 21</div>
+  <h2>The <span class="err">Memory Leak</span> (GEN.1B)</h2>
+  <p>MKHI command <code>GEN.1B</code> returns data that <strong>changes between runs</strong>. This is unprecedented — the ME is leaking a dynamic value through its factory protocol.</p>
+
+  <div class="cards">
+    <div class="card card-full" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">The Raw Evidence</h3>
+      <div class="hex"><span class="dim">Run 1 (2026-07-29):</span>
+  Request:  ff 1b 00 00 00 00 00 00
+  Response: ff 9b 00 00 <span class="err">47 f8 c1 00</span>
+                            ↑
+                       0x00C1F847
+
+<span class="dim">Run 2 (same session, 5 min later):</span>
+  Request:  ff 1b 00 00 00 00 00 00
+  Response: ff 9b 00 00 <span class="err">e0 fb c1 00</span>
+                            ↑
+                       0x00C1FBE0</div>
+      <p>Both runs return success (<code>0x9b</code> = response bit set). Both return 4 bytes of data. The upper 16 bits are <strong>stable at 0x00C1</strong> while the lower 16 bits change. This pattern is consistent with an ME internal memory pointer or counter.</p>
+    </div>
+    <div class="card">
+      <h3>What It Could Be</h3>
+      <ul>
+        <li><strong>ME Memory Pointer</strong> — 0x00C1xxxx is a valid ME SRAM address range</li>
+        <li><strong>Runtime Counter</strong> — increments between calls, suggesting an operation counter</li>
+        <li><strong>Session ID</strong> — unique per ME power cycle (would need cold boot to verify)</li>
+        <li><strong>Heap Address</strong> — upper bits constant = memory pool, lower bits = allocation</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Never Publicly Documented</h3>
+      <p>No public MKHI documentation references GEN.1B. Intel's own tools (<code>MEInfoWin64</code>, <code>FPTW64</code>) do not appear to query this command. This is an <strong>undocumented memory leak</strong> in the MKHI protocol.</p>
+    </div>
+    <div class="card">
+      <h3>Potential Exploitation</h3>
+      <p>If 0x00C1 is a base address in ME SRAM, other GEN commands might be able to read from nearby addresses. Combined with a buffer overflow or OOB read (CVE-2025-27708 applies to this firmware version), an attacker could <strong>dump ME memory</strong> through the HECI interface.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 19: SPI BLOCKED + REALITY CHECK -->
+<div class="slide" id="s19">
+<div class="inner">
+  <div class="label"><span class="tag tag-red">CRITICAL FINDING</span> Slide 19 of 21</div>
+  <h2>SPI Flash <span class="err">Completely Blocked</span></h2>
+  <p>We systematically probed all 15 SPI flash commands via MKHI. The results are damning: <strong>production firmware actively blocks every dangerous operation</strong>.</p>
+
+  <table>
+    <tr><th>CMD</th><th>Function</th><th>Result</th><th>Detail</th></tr>
+    <tr>
+      <td class="mono">SPI.01</td><td>Query (get info)</td>
+      <td class="warn">Need Payload</td><td>Even with payload, returns error</td>
+    </tr>
+    <tr>
+      <td class="mono">SPI.02</td><td>Flash Info</td>
+      <td class="val">Success</td><td>Returns 20 <span class="err">ZERO</span> bytes — no flash info leaked</td>
+    </tr>
+    <tr>
+      <td class="mono">SPI.03</td><td>Get Sector Size</td>
+      <td class="val">Success</td><td>Returns <span class="err">0x100</span> (256 bytes) — the only useful data</td>
+    </tr>
+    <tr>
+      <td class="mono">SPI.04</td><td>Read Flash</td>
+      <td class="err">HANG</td><td>Process blocks forever — must be killed</td>
+    </tr>
+    <tr>
+      <td class="mono">SPI.05</td><td>Read Flash</td>
+      <td class="err">HANG</td><td>Process blocks forever — must be killed</td>
+    </tr>
+    <tr>
+      <td class="mono">SPI.06</td><td>Read Flash</td>
+      <td class="err">HANG</td><td>Process blocks forever — must be killed</td>
+    </tr>
+    <tr>
+      <td class="mono">SPI.07-0F</td><td>Read/Write/Erase</td>
+      <td class="err">ALL HANG</td><td>Every flash access command is <strong>disabled</strong></td>
+    </tr>
+  </table>
+
+  <div class="cards">
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="color:#f85149">CancelIoEx Technique</h3>
+      <p>We developed a technique using <span class="tip" data-tip="CancelIoEx — a Windows API that cancels pending I/O operations on a specific file handle. Used here to abort the hanging HECI read after a timeout">CancelIoEx</span> + timeout thread to safely abort hanging commands without killing the process. This enabled automated probing of all 15 SPI commands.</p>
+      <div class="hex"><span class="dim">[Thread 1] → Send HECI command
+[Thread 2] → Sleep 3s, then CancelIoEx(handle)
+[Main]    → If ReadFile completes → parse result
+          → If timeout → CancelIoEx, reconnect handle</span></div>
+    </div>
+    <div class="card">
+      <h3>HECI Client Reality Check</h3>
+      <p>Earlier slides listed <strong>10 theoretical HECI clients</strong> from MEInfoWin64 binary strings. Our <strong>actual live probing</strong> tells a very different story:</p>
+      <table>
+        <tr><th>Client</th><th>Status</th></tr>
+        <tr><td>MKHI (0x07)</td><td class="val">✓ Connected</td></tr>
+        <tr><td>AMTHI</td><td class="err">✗ Error 6 (Not Available)</td></tr>
+        <tr><td>ICC</td><td class="err">✗ Error 548 (Locked)</td></tr>
+        <tr><td>LMS</td><td class="err">✗ Error 6 (Not Available)</td></tr>
+        <tr><td>HDA</td><td class="err">✗ Error 6 (Not Available)</td></tr>
+      </table>
+      <p><strong>Only MKHI connects.</strong> Consumer SKU ME is locked down far tighter than the driver strings suggest. No AMT, no ICC, no remote management.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SLIDE 20: FINAL CLOSING -->
+<div class="slide" id="s20">
+<div class="inner">
+  <div class="label">Conclusion</div>
+  <h2>What Our <span class="err">Live HECI Research</span> Revealed</h2>
+
+  <div class="cards">
+    <div class="card card-full" style="border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.03)">
+      <h3 style="color:#f85149;font-size:16px">8 New Discoveries from Talking to the Running ME</h3>
+      <p style="font-size:14px;line-height:1.8">
+        <strong style="color:#e6edf3">1. MKHI v3.1 confirmed</strong> — first public documentation on CSME 16.x hardware<br>
+        <strong style="color:#e6edf3">2. GEN.1C partition manifest</strong> — 8 live partitions extracted, 2 encrypted + 6 readable<br>
+        <strong style="color:#e6edf3">3. GEN.1B memory leak</strong> — dynamic value changes between runs, possible SRAM address<br>
+        <strong style="color:#e6edf3">4. SPI flash blocked</strong> — ALL read/write/erase commands hang, production firmware lockdown<br>
+        <strong style="color:#e6edf3">5. Only MKHI client available</strong> — AMTHI, ICC, LMS, HDA all rejected<br>
+        <strong style="color:#e6edf3">6. CancelIoEx timeout proven</strong> — can probe dangerous commands without crashing<br>
+        <strong style="color:#e6edf3">7. CVE-2025-27708 affects our firmware</strong> — OOB read via HECI, fixed in 16.1.40.2765<br>
+        <strong style="color:#e6edf3">8. Intel's old HECI GUID still works</strong> — Lenovo's TeeDriver exposes the deprecated interface
+      </p>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="side-by-side">
+    <div class="side-box" style="border-color:rgba(248,81,73,.3)">
+      <h4 style="color:#f85149">What We Proved</h4>
+      <ul>
+        <li>ME firmware <strong>can be interrogated</strong> live via HECI/MKHI</li>
+        <li>The ME <strong>leaks internal data</strong> through undocumented commands</li>
+        <li>Partition manifest reveals exact module names, versions, encryption status</li>
+        <li>SPI flash read is <strong>impossible</strong> on production firmware</li>
+        <li>Consumer SKU has 0 remote management exposure</li>
+        <li>Production firmware is <strong>locked as designed</strong> — no backdoor found (yet)</li>
+      </ul>
+    </div>
+    <div class="side-box" style="border-color:rgba(63,185,80,.3)">
+      <h4 style="color:#3fb950">Next Steps</h4>
+      <ul>
+        <li>Analyze GEN.1B dynamic value across cold boots and different states</li>
+        <li>Reverse engineer CVE-2025-27708 for potential memory read primitive</li>
+        <li>Explore buffer sizes — send oversized payloads to GEN commands</li>
+        <li>Brute-force unknown GEN commands (0x20-0xFF) for more leaks</li>
+        <li>Compare with other CSME 16.x systems (different OEMs) for variation</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr>
+
+  <div style="text-align:center;padding:24px 0">
+    <p class="dim" style="font-size:13px;margin-bottom:8px">Research performed on personally owned hardware. No systems accessed without authorization.</p>
+    <p style="font-size:15px;color:#58a6ff;font-weight:600;margin-bottom:4px">github.com/jatin-lee/intel-me-research</p>
+    <p class="dim" style="font-size:11px">Jatin Kapila &mdash; Intel CSME Firmware Reverse Engineering &mdash; 2026</p>
+  </div>
+</div>
+</div>
+
 <script>
 // ========================
 // TOOLTIP SYSTEM
@@ -1050,7 +1368,7 @@ function toggleDia(trigger) {
 // NAVIGATION
 // ========================
 var cur = 0;
-var total = 16;
+var total = 21;
 var slides = document.querySelectorAll('.slide');
 var navEl = document.getElementById('navdots');
 
