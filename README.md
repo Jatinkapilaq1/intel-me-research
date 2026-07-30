@@ -25,7 +25,9 @@ MKHI v3.1 | FW 16.0.1735.15 | 8 partitions found | GEN.1B: 0x00C344CA (changes e
 
 **We confirmed**: 7/12 MKHI commands respond. The ME is alive, talking, and leaking memory.
 
-[▶️ Watch the 60-second demo](https://youtube.com/shorts/...) <!-- Insert your Shorts link here -->
+[▶️ Watch the 35-second demo](https://youtube.com/shorts/...) <!-- Upload INTEL.mp4 to YouTube Shorts and paste link here -->
+
+**[📊 View the full 21-slide presentation](https://jatinkapilaq1.github.io/intel-me-research/evidence/PRESENTATION.html)**
 
 ---
 
